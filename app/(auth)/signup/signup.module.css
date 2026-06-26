@@ -1,0 +1,71 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.card {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 20px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #6b7280;
+}
+
+.roleSelection {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background-color: #f9fafb;
+}
+
+.roleLabel {
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 24px;
+}
+
+.dividerWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.divider {
+  flex: 1;
+}
+
+.loginLink {
+  text-align: center;
+}
+
+.link {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}

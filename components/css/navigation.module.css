@@ -1,0 +1,6 @@
+.logoTypography {
+  margin-left: 2;
+  flex-grow: 1;
+  font-weight: 700;
+  letter-spacing: 0.2rem;
+}
