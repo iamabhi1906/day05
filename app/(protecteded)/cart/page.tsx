@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
-import ProductsPage from './products-page';
+import CartPage from './cart-page';
 import { getSession } from '@/lib/auth';
-import { getPublishedProducts } from '@/lib/crud/product';
+import { getCartItems } from '@/lib/crud/cart';
 import { getUserByEmail } from '@/lib/crud/user';
 
 export default async function Page() {
@@ -12,7 +12,7 @@ export default async function Page() {
   const user = await getUserByEmail(email);
   if (!user) redirect('/login');
 
-  const products = await getPublishedProducts();
+  const cartItems = await getCartItems(email);
 
-  return <ProductsPage products={products} user={user} />;
+  return <CartPage initialItems={cartItems} user={user} />;
 }

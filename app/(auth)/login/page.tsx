@@ -19,6 +19,10 @@ type NotificationState = {
   severity: NotificationSeverity;
 };
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  return error instanceof Error ? error.message : fallback;
+};
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -43,12 +47,10 @@ export default function LoginPage() {
       setLoading(true);
       await GoogleLogin();
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
-      // TODO: Uncomment to redirect
       router.push('/dashboard');
-      router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      showNotification(error?.message || 'Login failed', NotificationSeverity.ERROR);
+      showNotification(getErrorMessage(error, 'Login failed'), NotificationSeverity.ERROR);
     } finally {
       setLoading(false);
     }
@@ -57,12 +59,11 @@ export default function LoginPage() {
   const handleEmailLogin = async () => {
     try {
       setLoading(true);
-      EmailLogin(email, password);
+      await EmailLogin(email, password);
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
       router.push('/dashboard');
-      router.refresh();
-    } catch (error: any) {
-      showNotification(error?.message || 'Login Failed', NotificationSeverity.ERROR);
+    } catch (error: unknown) {
+      showNotification(getErrorMessage(error, 'Login Failed'), NotificationSeverity.ERROR);
     } finally {
       setLoading(false);
     }

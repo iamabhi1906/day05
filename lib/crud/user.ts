@@ -53,7 +53,6 @@ export const getUserByEmail = async (email: string): Promise<UserData | null> =>
     }
     const userDoc = result.docs[0];
     const data = userDoc.data();
-    console.log(data);
     return {
       id: data.id,
       email: data.email,

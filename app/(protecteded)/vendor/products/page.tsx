@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
-import ProductsPage from './products-page';
+import VendorProducts from './vendor-products';
 import { getSession } from '@/lib/auth';
-import { getPublishedProducts } from '@/lib/crud/product';
 import { getUserByEmail } from '@/lib/crud/user';
+import { getVendorProducts } from '@/lib/crud/product';
 
 export default async function Page() {
   const session = await getSession();
@@ -11,8 +11,9 @@ export default async function Page() {
 
   const user = await getUserByEmail(email);
   if (!user) redirect('/login');
+  if (user.role !== 'vendor') redirect('/products');
 
-  const products = await getPublishedProducts();
+  const products = await getVendorProducts(email);
 
-  return <ProductsPage products={products} user={user} />;
+  return <VendorProducts initialProducts={products} user={user} />;
 }

@@ -2,8 +2,9 @@ import { AppBar, Container, Toolbar, Typography } from '@mui/material';
 import MainLogo from './main-logo';
 import NavigationMenu from './navigation-menu';
 import styles from '@/components/css/navigation.module.css';
+import { UserData } from '@/lib/crud/user';
 
-export default function NavigationBar() {
+export default function NavigationBar({ user }: { user?: UserData }) {
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -13,7 +14,7 @@ export default function NavigationBar() {
             StyleStreet
           </Typography>
 
-          <NavigationMenu />
+          <NavigationMenu user={user} />
         </Toolbar>
       </Container>
     </AppBar>

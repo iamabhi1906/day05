@@ -16,9 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${lato.className} ${styles.mainBody}`}>
-      <AppRouterCacheProvider>
-        <body className={`${styles.body}`}>{children}</body>
-      </AppRouterCacheProvider>
+      <body className={`${styles.body}`}>
+        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
+      </body>
     </html>
   );
 }

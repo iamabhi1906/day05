@@ -1,4 +1,5 @@
 import { auth } from '@/lib/firebase';
+import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { createSession } from '../auth-session';
 
@@ -8,9 +9,9 @@ export const EmailLogin = async (email: string, password: string): Promise<strin
     const idToken = await result.user.getIdToken();
     await createSession(idToken);
     return null;
-  } catch (error: any) {
+  } catch (error: unknown) {
     let message = 'Login failed';
-    if (error) {
+    if (error instanceof FirebaseError) {
       switch (error.code) {
         case 'auth/invalid-credential':
         case 'auth/user-not-found':

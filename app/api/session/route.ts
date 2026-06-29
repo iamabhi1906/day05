@@ -13,11 +13,12 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ status: 'success' });
     response.cookies.set('session', idToken, {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
       path: '/',
     });
     return response;
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 }

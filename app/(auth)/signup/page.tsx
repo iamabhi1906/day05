@@ -34,6 +34,10 @@ type NotificationState = {
 
 type UserRole = 'user' | 'vendor';
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  return error instanceof Error ? error.message : fallback;
+};
+
 export default function SignupPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
@@ -64,9 +68,8 @@ export default function SignupPage() {
       await EmailSignup(email, password, role);
       showNotification('Signup success!', NotificationSeverity.SUCCESS);
       router.push('/dashboard');
-      router.refresh();
-    } catch (error: any) {
-      showNotification(error?.message || 'Failed to signUp..!!', NotificationSeverity.ERROR);
+    } catch (error: unknown) {
+      showNotification(getErrorMessage(error, 'Failed to signUp..!!'), NotificationSeverity.ERROR);
     } finally {
       setLoading(false);
     }

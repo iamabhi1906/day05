@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
-import ProductsPage from './products-page';
+import OrdersPage from './orders-page';
 import { getSession } from '@/lib/auth';
-import { getPublishedProducts } from '@/lib/crud/product';
+import { getBuyerOrders } from '@/lib/crud/order';
 import { getUserByEmail } from '@/lib/crud/user';
 
 export default async function Page() {
@@ -12,7 +12,7 @@ export default async function Page() {
   const user = await getUserByEmail(email);
   if (!user) redirect('/login');
 
-  const products = await getPublishedProducts();
+  const orders = await getBuyerOrders(email);
 
-  return <ProductsPage products={products} user={user} />;
+  return <OrdersPage orders={orders} />;
 }
