@@ -28,7 +28,7 @@ import { UserData } from '@/lib/crud/user';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
-  currency: 'USD',
+  currency: 'INR',
 });
 
 export default function CartPage({ initialItems, user }: { initialItems: CartItemData[]; user: UserData }) {

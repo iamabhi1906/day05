@@ -4,9 +4,9 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { createSession } from '../auth-session';
 import { createUser } from '@/lib/crud/user';
 
-export async function EmailSignup(email: string, password: string, role: string) {
+export async function EmailSignup(name: string, email: string, password: string, role: string) {
   try {
-    if (!email || !password) {
+    if (!name.trim() || !email || !password) {
       throw new Error('Please fill in all fields!');
     }
     if (password.length < 6) {
@@ -16,8 +16,7 @@ export async function EmailSignup(email: string, password: string, role: string)
       throw new Error('Please provide a valid role!');
     }
     const result = await createUserWithEmailAndPassword(auth, email, password);
-    const user = await createUser(result.user, role);
-    console.log(user);
+    const user = await createUser(result.user, role, name);
     const idToken = await result.user.getIdToken();
     await createSession(idToken);
   } catch (error: unknown) {

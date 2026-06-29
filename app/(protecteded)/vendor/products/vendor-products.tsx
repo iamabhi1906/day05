@@ -1,80 +1,14 @@
 'use client';
-
-import { useState } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  Chip,
-  Divider,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Snackbar,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
-import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import InventoryIcon from '@mui/icons-material/Inventory';
-import SaveIcon from '@mui/icons-material/Save';
-import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary';
-import { createProduct, deleteProduct, ProductData, ProductInput, ProductStatus, updateProduct } from '@/lib/crud/product';
+import { use, useState } from 'react';
+import { Alert, Box, Grid, Snackbar } from '@mui/material';
+import { CloudinaryUploadWidgetResults } from 'next-cloudinary';
+import { createProduct, deleteProduct, getVendorProducts, ProductData, ProductInput, updateProduct } from '@/lib/crud/product';
 import { UserData } from '@/lib/crud/user';
-
-type ProductFormState = {
-  id: string | null;
-  name: string;
-  description: string;
-  price: string;
-  stock: string;
-  category: string;
-  imageUrl: string;
-  imagePublicId: string;
-  status: ProductStatus;
-};
-
-type NotificationState = {
-  open: boolean;
-  message: string;
-  severity: 'success' | 'error';
-};
-
-type CloudinaryInfo = {
-  secure_url?: string;
-  public_id?: string;
-};
-
-const emptyForm: ProductFormState = {
-  id: null,
-  name: '',
-  description: '',
-  price: '',
-  stock: '',
-  category: '',
-  imageUrl: '',
-  imagePublicId: '',
-  status: 'draft',
-};
-
-const currency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
+import { ProductFormCard } from './components/product-form-card';
+import { ProductTable } from './components/product-table';
+import { VendorProductsHeader } from './components/vendor-products-header';
+import type { CloudinaryInfo, NotificationState, ProductFormState } from './types';
+import { emptyForm } from './types';
 
 const toProductInput = (form: ProductFormState, user: UserData): ProductInput => ({
   name: form.name.trim(),
@@ -82,20 +16,16 @@ const toProductInput = (form: ProductFormState, user: UserData): ProductInput =>
   price: Number(form.price),
   stock: Number(form.stock),
   category: form.category.trim(),
-  imageUrl: form.imageUrl,
+  imageUrl: form.imageUrls[0] || form.imageUrl,
+  imageUrls: form.imageUrls,
   imagePublicId: form.imagePublicId,
+  imagePublicIds: form.imagePublicIds,
   status: form.status,
   vendorEmail: user.email,
   vendorName: user.name || user.email,
 });
 
-export default function VendorProducts({
-  initialProducts,
-  user,
-}: {
-  initialProducts: ProductData[];
-  user: UserData;
-}) {
+export default function VendorProducts({ initialProducts, user }: { initialProducts: ProductData[]; user: UserData }) {
   const [products, setProducts] = useState<ProductData[]>(initialProducts);
   const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [loading, setLoading] = useState(false);
@@ -121,8 +51,8 @@ export default function VendorProducts({
     if (!form.name.trim() || !form.description.trim() || !form.category.trim()) {
       throw new Error('Name, description, and category are required.');
     }
-    if (!form.imageUrl) {
-      throw new Error('Please upload a product image.');
+    if (form.imageUrls.length === 0 && !form.imageUrl) {
+      throw new Error('Please upload at least one product image.');
     }
     if (Number(form.price) <= 0) {
       throw new Error('Price must be greater than zero.');
@@ -133,7 +63,7 @@ export default function VendorProducts({
   };
 
   const refreshProducts = async () => {
-    const nextProducts = await import('@/lib/crud/product').then((module) => module.getVendorProducts(user.email));
+    const nextProducts = await getVendorProducts(user.email);
     setProducts(nextProducts);
   };
 
@@ -169,7 +99,9 @@ export default function VendorProducts({
       stock: String(product.stock),
       category: product.category,
       imageUrl: product.imageUrl,
+      imageUrls: product.imageUrls ?? (product.imageUrl ? [product.imageUrl] : []),
       imagePublicId: product.imagePublicId,
+      imagePublicIds: product.imagePublicIds ?? (product.imagePublicId ? [product.imagePublicId] : []),
       status: product.status,
     });
   };
@@ -191,172 +123,40 @@ export default function VendorProducts({
   const handleUploadSuccess = (result: CloudinaryUploadWidgetResults) => {
     const info = result.info as CloudinaryInfo;
     if (!info.secure_url || !info.public_id) return;
+    const secureUrl = info.secure_url;
+    const publicId = info.public_id;
 
     setForm((current) => ({
       ...current,
-      imageUrl: info.secure_url || '',
-      imagePublicId: info.public_id || '',
+      imageUrl: current.imageUrl || secureUrl,
+      imageUrls: Array.from(new Set([...current.imageUrls, secureUrl])),
+      imagePublicId: current.imagePublicId || publicId,
+      imagePublicIds: Array.from(new Set([...current.imagePublicIds, publicId])),
     }));
   };
 
   return (
     <Box sx={{ p: 3 }}>
-      <Stack direction="row" spacing={1.5} sx={{ mb: 3, alignItems: 'center' }}>
-        <InventoryIcon color="primary" />
-        <Typography variant="h5">Vendor Products</Typography>
-      </Stack>
-
+      <VendorProductsHeader />
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
-          <Card variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography variant="h6">{form.id ? 'Edit product' : 'Add product'}</Typography>
-                <TextField label="Name" value={form.name} onChange={(event) => updateForm('name', event.target.value)} fullWidth />
-                <TextField
-                  label="Description"
-                  value={form.description}
-                  onChange={(event) => updateForm('description', event.target.value)}
-                  fullWidth
-                  multiline
-                  minRows={3}
-                />
-                <TextField label="Category" value={form.category} onChange={(event) => updateForm('category', event.target.value)} fullWidth />
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                  <TextField
-                    label="Price"
-                    type="number"
-                    value={form.price}
-                    onChange={(event) => updateForm('price', event.target.value)}
-                    fullWidth
-                  />
-                  <TextField
-                    label="Stock"
-                    type="number"
-                    value={form.stock}
-                    onChange={(event) => updateForm('stock', event.target.value)}
-                    fullWidth
-                  />
-                </Stack>
-                <FormControl fullWidth>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    label="Status"
-                    value={form.status}
-                    onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as ProductStatus }))}
-                  >
-                    <MenuItem value="draft">Draft</MenuItem>
-                    <MenuItem value="published">Published</MenuItem>
-                  </Select>
-                </FormControl>
-
-                {form.imageUrl ? (
-                  <CardMedia component="img" image={form.imageUrl} alt={form.name || 'Product image'} sx={{ height: 180, borderRadius: 1 }} />
-                ) : null}
-
-                <CldUploadWidget
-                  uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                  options={{ multiple: false, folder: 'stylestreet-products' }}
-                  onSuccess={handleUploadSuccess}
-                >
-                  {({ open, isLoading }) => (
-                    <Button
-                      variant="outlined"
-                      startIcon={<AddPhotoAlternateIcon />}
-                      disabled={isLoading || loading}
-                      onClick={() => open()}
-                    >
-                      Upload image
-                    </Button>
-                  )}
-                </CldUploadWidget>
-
-                <Stack direction="row" spacing={1}>
-                  <Button variant="contained" startIcon={<SaveIcon />} disabled={loading} onClick={handleSubmit}>
-                    {form.id ? 'Update' : 'Save'}
-                  </Button>
-                  <Button variant="outlined" disabled={loading} onClick={resetForm}>
-                    Clear
-                  </Button>
-                </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
+          <ProductFormCard
+            form={form}
+            loading={loading}
+            onFieldChange={updateForm}
+            onStatusChange={(value) => setForm((current) => ({ ...current, status: value }))}
+            onUploadSuccess={handleUploadSuccess}
+            onSubmit={handleSubmit}
+            onClear={resetForm}
+          />
         </Grid>
 
         <Grid size={{ xs: 12, md: 8 }}>
-          <TableContainer component={Paper} variant="outlined">
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Product</TableCell>
-                  <TableCell>Price</TableCell>
-                  <TableCell>Stock</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>
-                      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-                        <CardMedia
-                          component="img"
-                          image={product.imageUrl}
-                          alt={product.name}
-                          sx={{ width: 56, height: 56, borderRadius: 1 }}
-                        />
-                        <Box>
-                          <Typography variant="subtitle2">{product.name}</Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {product.category}
-                          </Typography>
-                        </Box>
-                      </Stack>
-                    </TableCell>
-                    <TableCell>{currency.format(product.price)}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={product.status}
-                        color={product.status === 'published' ? 'success' : 'default'}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
-                        <Button size="small" startIcon={<EditIcon />} onClick={() => handleEdit(product)}>
-                          Edit
-                        </Button>
-                        <Button size="small" color="error" startIcon={<DeleteIcon />} onClick={() => handleDelete(product.id)}>
-                          Delete
-                        </Button>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {products.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={5}>
-                      <Stack spacing={1.5} sx={{ py: 5, alignItems: 'center' }}>
-                        <Divider flexItem />
-                        <Typography color="text.secondary">No products yet.</Typography>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ) : null}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <ProductTable products={products} onEdit={handleEdit} onDelete={handleDelete} />
         </Grid>
       </Grid>
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={4000}
-        onClose={() => setNotification((current) => ({ ...current, open: false }))}
-      >
+      <Snackbar open={notification.open} autoHideDuration={4000} onClose={() => setNotification((current) => ({ ...current, open: false }))}>
         <Alert severity={notification.severity}>{notification.message}</Alert>
       </Snackbar>
     </Box>

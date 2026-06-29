@@ -1,14 +1,4 @@
-import {
-  addDoc,
-  collection,
-  DocumentData,
-  getDocs,
-  orderBy,
-  query,
-  QueryDocumentSnapshot,
-  serverTimestamp,
-  where,
-} from 'firebase/firestore';
+import { addDoc, collection, DocumentData, getDocs, orderBy, query, QueryDocumentSnapshot, serverTimestamp, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { CartItemData, clearCart } from './cart';
 
@@ -80,4 +70,25 @@ export const getBuyerOrders = async (buyerEmail: string): Promise<OrderData[]> =
   const q = query(ordersCollection, where('buyerEmail', '==', buyerEmail), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(orderFromDoc);
+};
+
+export const getVendorOrders = async (vendorEmail: string): Promise<OrderData[]> => {
+  const snapshot = await getDocs(ordersCollection);
+
+  const filteredOrders = snapshot.docs.map(orderFromDoc).filter((order) => order.items.some((item) => item.vendorEmail === vendorEmail));
+
+  return filteredOrders
+    .map((order) => {
+      const vendorItems = order.items.filter((item) => item.vendorEmail === vendorEmail);
+      return {
+        ...order,
+        items: vendorItems,
+        total: vendorItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      };
+    })
+    .sort((a, b) => {
+      const aTime = a.createdAt?.getTime() ?? 0;
+      const bTime = b.createdAt?.getTime() ?? 0;
+      return bTime - aTime;
+    });
 };

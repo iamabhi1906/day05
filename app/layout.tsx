@@ -3,6 +3,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import './globals.css';
 import { lato } from './ui/fonts';
 import styles from '@/app/_css/layout.module.css';
+import ThemeProviderComp from './theme';
 
 export const metadata: Metadata = {
   title: 'StyleStreet',
@@ -17,7 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${lato.className} ${styles.mainBody}`}>
       <body className={`${styles.body}`}>
-        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
+        <AppRouterCacheProvider>
+          {/* <ThemeProvider theme={theme}> */}
+          {/* <CssBaseline /> */}
+          <ThemeProviderComp>{children}</ThemeProviderComp>
+
+          {/* </ThemeProvider> */}
+        </AppRouterCacheProvider>
       </body>
     </html>
   );

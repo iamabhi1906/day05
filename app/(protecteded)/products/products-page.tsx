@@ -1,32 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  Chip,
-  Grid,
-  Snackbar,
-  Stack,
-  Typography,
-} from '@mui/material';
-import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import { useEffect, useState } from 'react';
+import { Alert, Box, Grid, Snackbar, Stack, Typography } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import { addProductToCart } from '@/lib/crud/cart';
+import ProductCard from './components/product-card';
+import { addProductToCart, CartItemData, getCartItems, updateCartItemQuantity } from '@/lib/crud/cart';
 import { ProductData } from '@/lib/crud/product';
 import { UserData } from '@/lib/crud/user';
 
-const currency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-});
-
 export default function ProductsPage({ products, user }: { products: ProductData[]; user: UserData }) {
+  const [cartItems, setCartItems] = useState<CartItemData[]>([]);
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
   const [notification, setNotification] = useState({
     open: false,
@@ -34,13 +17,37 @@ export default function ProductsPage({ products, user }: { products: ProductData
     severity: 'success' as 'success' | 'error',
   });
 
+  useEffect(() => {
+    const loadCartItems = async () => {
+      const items = await getCartItems(user.email);
+      setCartItems(items);
+    };
+
+    void loadCartItems();
+  }, [user.email]);
+
   const addToCart = async (product: ProductData) => {
     try {
       setLoadingProductId(product.id);
       await addProductToCart(user.email, product);
+      const refreshedItems = await getCartItems(user.email);
+      setCartItems(refreshedItems);
       setNotification({ open: true, message: 'Product added to cart.', severity: 'success' });
     } catch {
       setNotification({ open: true, message: 'Unable to add product to cart.', severity: 'error' });
+    } finally {
+      setLoadingProductId(null);
+    }
+  };
+
+  const changeQuantity = async (cartItem: CartItemData, quantity: number) => {
+    const safeQuantity = Math.max(1, quantity);
+    try {
+      setLoadingProductId(cartItem.productId);
+      await updateCartItemQuantity(cartItem.id, safeQuantity);
+      setCartItems((current) => current.map((item) => (item.id === cartItem.id ? { ...item, quantity: safeQuantity } : item)));
+    } catch {
+      setNotification({ open: true, message: 'Unable to update quantity.', severity: 'error' });
     } finally {
       setLoadingProductId(null);
     }
@@ -54,39 +61,21 @@ export default function ProductsPage({ products, user }: { products: ProductData
       </Stack>
 
       <Grid container spacing={3}>
-        {products.map((product) => (
-          <Grid key={product.id} size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardMedia component="img" image={product.imageUrl} alt={product.name} sx={{ height: 220 }} />
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Stack spacing={1}>
-                  <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <Typography variant="h6">{product.name}</Typography>
-                    <Chip label={product.category} size="small" />
-                  </Stack>
-                  <Typography variant="body2" color="text.secondary">
-                    {product.description}
-                  </Typography>
-                  <Typography variant="subtitle1">{currency.format(product.price)}</Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Sold by {product.vendorName}
-                  </Typography>
-                </Stack>
-              </CardContent>
-              <CardActions>
-                <Button
-                  variant="contained"
-                  startIcon={<AddShoppingCartIcon />}
-                  disabled={loadingProductId === product.id || product.stock <= 0}
-                  onClick={() => addToCart(product)}
-                  fullWidth
-                >
-                  {product.stock <= 0 ? 'Out of stock' : 'Add to cart'}
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
+        {products.map((product) => {
+          const cartItem = cartItems.find((item) => item.productId === product.id) ?? null;
+
+          return (
+            <Grid key={product.id} size={{ xs: 12, sm: 6, md: 3 }}> 
+              <ProductCard
+                product={product}
+                cartItem={cartItem}
+                loading={loadingProductId === product.id}
+                onAddToCart={addToCart}
+                onChangeQuantity={changeQuantity}
+              />
+            </Grid>
+          );
+        })}
       </Grid>
 
       {products.length === 0 ? (
@@ -95,11 +84,7 @@ export default function ProductsPage({ products, user }: { products: ProductData
         </Stack>
       ) : null}
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={4000}
-        onClose={() => setNotification((current) => ({ ...current, open: false }))}
-      >
+      <Snackbar open={notification.open} autoHideDuration={4000} onClose={() => setNotification((current) => ({ ...current, open: false }))}>
         <Alert severity={notification.severity}>{notification.message}</Alert>
       </Snackbar>
     </Box>

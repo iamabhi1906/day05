@@ -4,10 +4,9 @@ import { getUserByEmail } from '@/lib/crud/user';
 
 export default async function Page() {
   const session = await getSession();
-  const email = session?.email;
+  const email = await session?.email;
+  const user = await getUserByEmail(email!);
   if (!email) redirect('/login');
-
-  const user = await getUserByEmail(email);
   if (user?.role === 'vendor') redirect('/vendor/products');
   redirect('/products');
 }

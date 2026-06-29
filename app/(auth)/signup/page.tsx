@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import styles from './signup.module.css';
 import { EmailSignup } from './signup';
+import Link from 'next/link';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -40,6 +41,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export default function SignupPage() {
   const router = useRouter();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -65,7 +67,7 @@ export default function SignupPage() {
         throw new Error('Passwords do not match');
       }
       setLoading(true);
-      await EmailSignup(email, password, role);
+      await EmailSignup(name, email, password, role);
       showNotification('Signup success!', NotificationSeverity.SUCCESS);
       router.push('/dashboard');
     } catch (error: unknown) {
@@ -76,16 +78,16 @@ export default function SignupPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <Card className={styles.card}>
-        <CardContent>
+    <>
+      <Box className={styles.pageWrapper}>
+        <Box>
           <Stack spacing={3}>
             <Box className={styles.header}>
               <Typography variant="h5" className={styles.title}>
                 Create Your Account
               </Typography>
               <Typography variant="body2" className={styles.subtitle}>
-                Join us and start your journey today
+                Start your vendor or buyer journey with a beautiful, modern dashboard.
               </Typography>
             </Box>
 
@@ -93,12 +95,7 @@ export default function SignupPage() {
               <Typography variant="subtitle2" className={styles.roleLabel}>
                 Select Your Role
               </Typography>
-              <RadioGroup
-                row
-                value={role}
-                onChange={(e) => setRole(e.target.value as UserRole)}
-                className={styles.radioGroup}
-              >
+              <RadioGroup row value={role} onChange={(e) => setRole(e.target.value as UserRole)} className={styles.radioGroup}>
                 <FormControlLabel value="user" control={<Radio />} label="Buyer" disabled={loading} />
                 <FormControlLabel value="vendor" control={<Radio />} label="Vendor" disabled={loading} />
               </RadioGroup>
@@ -107,6 +104,15 @@ export default function SignupPage() {
             <Divider />
 
             <Stack spacing={2}>
+              <TextField
+                label="Your name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                fullWidth
+                disabled={loading}
+                autoComplete="name"
+              />
               <TextField
                 label="Email address"
                 type="email"
@@ -156,14 +162,14 @@ export default function SignupPage() {
             <Box className={styles.loginLink}>
               <Typography variant="body2">
                 Already have an account?{' '}
-                <a href="/login" className={styles.link}>
+                <Link href="/login" className={styles.link}>
                   Sign in
-                </a>
+                </Link>
               </Typography>
             </Box>
           </Stack>
-        </CardContent>
-      </Card>
+        </Box>
+      </Box>
 
       <Snackbar
         open={notification.open}
@@ -175,6 +181,6 @@ export default function SignupPage() {
           {notification.message}
         </Alert>
       </Snackbar>
-    </div>
+    </>
   );
 }

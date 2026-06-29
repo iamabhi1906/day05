@@ -14,14 +14,16 @@ export interface UserData {
   isBlocked: boolean;
 }
 
-export const createUser = async (user: UserInfo, role: string | null) => {
+export const createUser = async (user: UserInfo, role: string | null, name?: string) => {
   if (!user.email) return;
+  const normalizedName = name?.trim() || user.displayName || null;
+
   try {
     const newUser = {
       email: user.email,
       role,
       uid: user.uid,
-      name: user.displayName,
+      name: normalizedName,
       avatar: user.photoURL,
       phone: user.phoneNumber,
       createdAt: new Date(),
@@ -34,7 +36,7 @@ export const createUser = async (user: UserInfo, role: string | null) => {
     email: user.email,
     role,
     uid: user.uid,
-    name: user.displayName,
+    name: normalizedName,
     avatar: user.photoURL,
     phone: user.phoneNumber,
     createdAt: new Date(),

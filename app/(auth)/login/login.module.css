@@ -1,29 +1,48 @@
-.container {
-  min-height: 100vh;
+.pageWrapper {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+  background: none;
+  border-radius: 0;
 }
 
-.card {
-  width: 100%;
-  max-width: 440px;
-  border-radius: 20px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+.authWrapper {
+  width: min(1100px, 100%);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+.formCard {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 28px 80px rgba(14, 30, 37, 0.12);
+}
+
+.promoCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+  color: #f8fafc;
 }
 
 .header {
-  text-align: center;
+  text-align: left;
 }
 
 .title {
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .subtitle {
-  color: #6b7280;
+  color: rgba(15, 23, 42, 0.72);
+  margin-top: 8px;
 }
 
 .dividerWrapper {
@@ -34,4 +53,41 @@
 
 .divider {
   flex: 1;
+}
+
+.signupLink {
+  text-align: center;
+}
+
+.link {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.link:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+.promoOverline {
+  letter-spacing: 0.24em;
+  margin-bottom: 20px;
+  color: #93c5fd;
+}
+
+.promoTitle {
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.promoText {
+  color: rgba(248, 250, 252, 0.9);
+  margin-bottom: 28px;
+  line-height: 1.7;
+}
+
+.promoFooter {
+  display: grid;
+  gap: 4px;
 }

@@ -8,7 +8,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const session = await getSession();
   const email = session?.email;
   if (!email) redirect('/login');
-  const user = await getUserByEmail(email);
+  const user = await getUserByEmail(email!);
   if (!user) redirect('/login');
   if (user.role == null) return <UserRoleSelect user={user} />;
   return (

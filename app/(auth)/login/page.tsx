@@ -7,6 +7,7 @@ import { Alert, Box, Button, Card, CardContent, Divider, Snackbar, Stack, TextFi
 import styles from './login.module.css';
 import { EmailLogin } from './login';
 import { GoogleLogin } from '../auth-session';
+import Link from 'next/link';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -70,61 +71,65 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.container}>
-      <Card className={styles.card}>
-        <CardContent>
-          <Stack spacing={3}>
-            <Box className={styles.header}>
-              <Typography variant="h5" className={styles.title}>
-                Sign in to Your Account
-              </Typography>
-            </Box>
+    <>
+      <Box className={styles.pageWrapper}>
+        <Stack spacing={3}>
+          <Box className={styles.header}>
+            <Typography variant="h5" className={styles.title}>
+              Sign in to Your Account
+            </Typography>
+            <Typography variant="body2" className={styles.subtitle}>
+              Access your dashboard, manage orders and continue where you left off.
+            </Typography>
+          </Box>
 
-            <Button
-              variant="outlined"
-              startIcon={<GoogleIcon />}
+          <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth onClick={handleGoogleLogin} disabled={loading}>
+            {loading ? 'Processing...' : 'Continue with Google'}
+          </Button>
+
+          <Box className={styles.dividerWrapper}>
+            <Divider className={styles.divider} />
+            <Typography variant="caption" color="textSecondary">
+              OR
+            </Typography>
+            <Divider className={styles.divider} />
+          </Box>
+
+          <Stack spacing={2}>
+            <TextField
+              label="Email address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               fullWidth
-              onClick={handleGoogleLogin}
               disabled={loading}
-            >
-              {loading ? 'Processing...!!' : 'Continue with Google'}
-            </Button>
-
-            <Box className={styles.dividerWrapper}>
-              <Divider className={styles.divider} />
-              <Typography variant="caption" color="textSecondary">
-                OR
-              </Typography>
-              <Divider className={styles.divider} />
-            </Box>
-
-            <Stack spacing={2}>
-              <TextField
-                label="Email address"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                fullWidth
-                disabled={loading}
-                autoComplete="email"
-              />
-              <TextField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                fullWidth
-                disabled={loading}
-                autoComplete="current-password"
-              />
-            </Stack>
-
-            <Button variant="contained" fullWidth onClick={handleEmailLogin} disabled={loading}>
-              {loading ? 'Signing in...' : 'Login with Email'}
-            </Button>
+              autoComplete="email"
+            />
+            <TextField
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              fullWidth
+              disabled={loading}
+              autoComplete="current-password"
+            />
           </Stack>
-        </CardContent>
-      </Card>
+
+          <Button variant="contained" fullWidth onClick={handleEmailLogin} disabled={loading}>
+            {loading ? 'Signing in...' : 'Login with Email'}
+          </Button>
+
+          <Box className={styles.signupLink}>
+            <Typography variant="body2">
+              Don't have an account?{' '}
+              <Link href="/signup" className={styles.link}>
+                Sign up
+              </Link>
+            </Typography>
+          </Box>
+        </Stack>
+      </Box>
 
       <Snackbar
         open={notification.open}
@@ -136,6 +141,6 @@ export default function LoginPage() {
           {notification.message}
         </Alert>
       </Snackbar>
-    </div>
+    </>
   );
 }

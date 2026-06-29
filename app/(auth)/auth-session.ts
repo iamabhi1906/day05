@@ -16,18 +16,14 @@ export const createSession = async (idToken: string) => {
 
 export const GoogleLogin = async () => {
   try {
-    console.log('I am here');
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const idToken = await result.user.getIdToken();
     await createSession(idToken);
     if (!result.user.email) return;
     const user = await getUserByEmail(result.user.email);
-    console.log(user);
     if (!user) {
-      console.log('creating');
       const user = await createUser(result.user, null);
-      console.log('Created');
       return user;
     } else {
       return user;

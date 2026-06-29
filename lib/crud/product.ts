@@ -4,6 +4,7 @@ import {
   deleteDoc,
   DocumentData,
   doc,
+  getDoc,
   getDocs,
   orderBy,
   query,
@@ -24,7 +25,9 @@ export interface ProductData {
   stock: number;
   category: string;
   imageUrl: string;
+  imageUrls: string[];
   imagePublicId: string;
+  imagePublicIds: string[];
   status: ProductStatus;
   vendorEmail: string;
   vendorName: string;
@@ -42,6 +45,17 @@ const toDate = (value: { toDate?: () => Date } | null | undefined) => {
 
 const productFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): ProductData => {
   const data = snapshot.data();
+  const imageUrls = Array.isArray(data.imageUrls)
+    ? data.imageUrls.filter((value) => typeof value === 'string' && value.length > 0)
+    : data.imageUrl
+      ? [data.imageUrl]
+      : [];
+  const imagePublicIds = Array.isArray(data.imagePublicIds)
+    ? data.imagePublicIds.filter((value) => typeof value === 'string' && value.length > 0)
+    : data.imagePublicId
+      ? [data.imagePublicId]
+      : [];
+
   return {
     id: snapshot.id,
     name: data.name,
@@ -49,8 +63,10 @@ const productFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): ProductD
     price: Number(data.price || 0),
     stock: Number(data.stock || 0),
     category: data.category,
-    imageUrl: data.imageUrl,
-    imagePublicId: data.imagePublicId,
+    imageUrl: imageUrls[0] || data.imageUrl || '',
+    imageUrls,
+    imagePublicId: imagePublicIds[0] || data.imagePublicId || '',
+    imagePublicIds,
     status: data.status,
     vendorEmail: data.vendorEmail,
     vendorName: data.vendorName,
@@ -65,7 +81,6 @@ export const createProduct = async (product: ProductInput) => {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
-
   return docRef.id;
 };
 
@@ -90,4 +105,18 @@ export const getPublishedProducts = async (): Promise<ProductData[]> => {
   const q = query(productsCollection, where('status', '==', 'published'), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(productFromDoc);
+};
+
+export const getProduct = async (productId: string): Promise<ProductData | null> => {
+  try {
+    const docRef = doc(db, 'products', productId);
+    const snapshot = await getDoc(docRef);
+    if (!snapshot.exists()) {
+      return null;
+    }
+    return productFromDoc(snapshot as QueryDocumentSnapshot<DocumentData>);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
 };

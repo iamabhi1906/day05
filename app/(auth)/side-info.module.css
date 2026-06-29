@@ -1,0 +1,145 @@
+.mainContainer {
+  background-color: var(--mui-palette-primary-main);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+  padding: 50px 40px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.logoContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  fill: var(--mui-palette-primary-contrastText);
+}
+
+.logoText {
+  color: var(--mui-palette-primary-contrastText);
+  letter-spacing: 0.1rem;
+  font-weight: 700;
+}
+
+.tagline {
+  color: var(--mui-palette-primary-contrastText);
+  margin-top: 16px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.5;
+}
+
+.divider {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  margin: 24px 0;
+  position: relative;
+  z-index: 1;
+}
+
+
+.featureCard {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  align-items: flex-start;
+  padding: 12px;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.featureIcon {
+  color: var(--mui-palette-primary-contrastText);
+  font-size: 20px;
+}
+
+.featureTitle {
+  color: var(--mui-palette-primary-contrastText);
+  font-weight: 600;
+  margin: 0;
+}
+
+.featureDescription {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.trustSection {
+  width: 100%;
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.trustTitle {
+  color: var(--mui-palette-primary-contrastText);
+  font-weight: 600;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.statBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.statNumber {
+  color: var(--mui-palette-primary-contrastText);
+  font-weight: 700;
+  margin: 0;
+}
+
+.statLabel {
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.ctaSection {
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.ctaText {
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
