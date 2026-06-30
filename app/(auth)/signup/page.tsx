@@ -10,7 +10,8 @@ import styles from './signup.module.css';
 import { EmailSignup } from './signup';
 import Link from 'next/link';
 import { SignupSchema, SignupFormData } from '@/lib/schemas/auth.schema';
-import { RHFTextField, RHFRadioGroup } from '@/components/form-components';
+import { GoogleLogin } from '../auth-session';
+import InputField from '@/components/input-filed';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -25,6 +26,14 @@ type NotificationState = {
 
 const getErrorMessage = (error: unknown, fallback: string) => {
   return error instanceof Error ? error.message : fallback;
+};
+
+const defaultValues: SignupFormData = {
+  name: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  role: 'user',
 };
 
 export default function SignupPage() {
@@ -42,14 +51,9 @@ export default function SignupPage() {
     formState: { isValid },
   } = useForm<SignupFormData>({
     resolver: zodResolver(SignupSchema),
-    mode: 'onChange',
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      role: 'user',
-    },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    defaultValues,
   });
 
   const showNotification = (message: string, severity: NotificationSeverity) => {
@@ -73,6 +77,20 @@ export default function SignupPage() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      await GoogleLogin();
+      showNotification('SignUp success..!!', NotificationSeverity.SUCCESS);
+      router.push('/dashboard');
+    } catch (error: unknown) {
+      console.error(error);
+      showNotification(getErrorMessage(error, 'Login failed'), NotificationSeverity.ERROR);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <Box className={styles.pageWrapper}>
@@ -87,29 +105,28 @@ export default function SignupPage() {
               </Typography>
             </Box>
 
-            <Box className={styles.roleSelection}>
-              <Typography variant="subtitle2" className={styles.roleLabel}>
-                Select Your Role
-              </Typography>
-              <RHFRadioGroup
-                name="role"
-                control={control}
-                options={[
-                  { value: 'user', label: 'Buyer' },
-                  { value: 'vendor', label: 'Vendor' },
-                ]}
-                row
-              />
-            </Box>
-
-            <Divider />
-
             <form onSubmit={handleSubmit(handleEmailSignup)}>
+              <Box className={styles.roleSelection}>
+                <Typography variant="subtitle2" className={styles.roleLabel}>
+                  Select Your Role
+                </Typography>
+                <InputField
+                  name="role"
+                  label=''
+                  control={control as any}
+                  type="radio"
+                  options={[
+                    { value: 'user', label: 'Buyer' },
+                    { value: 'vendor', label: 'Vendor' },
+                  ]}
+                />
+              </Box>
+
               <Stack spacing={2}>
-                <RHFTextField name="name" control={control} label="Your name" type="text" placeholder="John Doe" />
-                <RHFTextField name="email" control={control} label="Email address" type="email" placeholder="you@example.com" />
-                <RHFTextField name="password" control={control} label="Password" type="password" placeholder="••••••••" />
-                <RHFTextField name="confirmPassword" control={control} label="Confirm Password" type="password" placeholder="••••••••" />
+                <InputField name="name" control={control} label="Your name" type="text" placeholder="John Doe" />
+                <InputField name="email" control={control} label="Email address" type="email" placeholder="you@example.com" />
+                <InputField name="password" control={control} label="Password" type="password" />
+                <InputField name="confirmPassword" control={control} label="Confirm Password" type="password" />
               </Stack>
 
               <Button variant="contained" fullWidth type="submit" disabled={loading || !isValid} sx={{ mt: 3 }}>
@@ -125,7 +142,7 @@ export default function SignupPage() {
               <Divider className={styles.divider} />
             </Box>
 
-            <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth disabled={loading}>
+            <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth disabled={loading} onClick={handleGoogleLogin}>
               {loading ? 'Processing...' : 'Continue with Google'}
             </Button>
 

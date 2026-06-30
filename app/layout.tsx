@@ -4,6 +4,7 @@ import './globals.css';
 import { lato } from './ui/fonts';
 import styles from '@/app/_css/layout.module.css';
 import ThemeProviderComp from './theme';
+import { Box } from '@mui/material';
 
 export const metadata: Metadata = {
   title: 'StyleStreet',
@@ -17,13 +18,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${lato.className} ${styles.mainBody}`}>
-      <body className={`${styles.body}`}>
+      <body>
         <AppRouterCacheProvider>
-          {/* <ThemeProvider theme={theme}> */}
-          {/* <CssBaseline /> */}
-          <ThemeProviderComp>{children}</ThemeProviderComp>
-
-          {/* </ThemeProvider> */}
+          <ThemeProviderComp>
+            <Box className={styles.body}>{children}</Box>
+          </ThemeProviderComp>
         </AppRouterCacheProvider>
       </body>
     </html>

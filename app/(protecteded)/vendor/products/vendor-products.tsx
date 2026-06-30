@@ -1,50 +1,33 @@
 'use client';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { Alert, Box, Grid, Snackbar } from '@mui/material';
+import { CloudinaryUploadWidgetResults } from 'next-cloudinary';
 import { createProduct, deleteProduct, getVendorProducts, ProductData, ProductInput, updateProduct } from '@/lib/crud/product';
 import { UserData } from '@/lib/crud/user';
-import { ProductFormCard } from './components/product-form-card-new';
+import { ProductFormCard } from './components/product-form-card';
 import { ProductTable } from './components/product-table';
 import { VendorProductsHeader } from './components/vendor-products-header';
-import { ProductFormData } from '@/lib/schemas/product.schema';
-import { productCategories } from './types';
+import type { CloudinaryInfo, NotificationState, ProductFormState } from './types';
+import { emptyForm } from './types';
 
-type NotificationState = {
-  open: boolean;
-  message: string;
-  severity: 'success' | 'error';
-};
-
-type EditingProduct = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  imageUrls: string[];
-  status: 'draft' | 'published';
-};
-
-const toProductInput = (formData: ProductFormData, editingId: string | null, user: UserData): ProductInput => ({
-  name: formData.name.trim(),
-  description: formData.description.trim(),
-  price: formData.price,
-  stock: formData.stock,
-  category: formData.category.trim(),
-  imageUrl: formData.imageUrls[0] || '',
-  imageUrls: formData.imageUrls,
-  imagePublicId: '', // Will be handled by Cloudinary
-  imagePublicIds: [], // Will be handled by Cloudinary
-  status: formData.status,
+const toProductInput = (form: ProductFormState, user: UserData): ProductInput => ({
+  name: form.name.trim(),
+  description: form.description.trim(),
+  price: Number(form.price),
+  stock: Number(form.stock),
+  category: form.category.trim(),
+  imageUrl: form.imageUrls[0] || form.imageUrl,
+  imageUrls: form.imageUrls,
+  imagePublicId: form.imagePublicId,
+  imagePublicIds: form.imagePublicIds,
+  status: form.status,
   vendorEmail: user.email,
   vendorName: user.name || user.email,
 });
 
 export default function VendorProducts({ initialProducts, user }: { initialProducts: ProductData[]; user: UserData }) {
   const [products, setProducts] = useState<ProductData[]>(initialProducts);
-  const [editingProduct, setEditingProduct] = useState<EditingProduct | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [form, setForm] = useState<ProductFormState>(emptyForm);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<NotificationState>({
     open: false,
@@ -56,9 +39,27 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
     setNotification({ open: true, message, severity });
   };
 
+  const updateForm = (field: keyof ProductFormState, value: string) => {
+    setForm((current) => ({ ...current, [field]: value }));
+  };
+
   const resetForm = () => {
-    setEditingProduct(null);
-    setImageUrls([]);
+    setForm(emptyForm);
+  };
+
+  const validateForm = () => {
+    if (!form.name.trim() || !form.description.trim() || !form.category.trim()) {
+      throw new Error('Name, description, and category are required.');
+    }
+    if (form.imageUrls.length === 0 && !form.imageUrl) {
+      throw new Error('Please upload at least one product image.');
+    }
+    if (Number(form.price) <= 0) {
+      throw new Error('Price must be greater than zero.');
+    }
+    if (Number(form.stock) < 0) {
+      throw new Error('Stock cannot be negative.');
+    }
   };
 
   const refreshProducts = async () => {
@@ -66,13 +67,14 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
     setProducts(nextProducts);
   };
 
-  const handleFormSubmit = async (formData: ProductFormData) => {
+  const handleSubmit = async () => {
     try {
       setLoading(true);
-      const payload = toProductInput(formData, editingProduct?.id || null, user);
+      validateForm();
+      const payload = toProductInput(form, user);
 
-      if (editingProduct) {
-        await updateProduct(editingProduct.id, payload);
+      if (form.id) {
+        await updateProduct(form.id, payload);
         showNotification('Product updated.', 'success');
       } else {
         await createProduct(payload);
@@ -89,17 +91,19 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
   };
 
   const handleEdit = (product: ProductData) => {
-    setEditingProduct({
+    setForm({
       id: product.id,
       name: product.name,
       description: product.description,
-      price: product.price,
-      stock: product.stock,
+      price: String(product.price),
+      stock: String(product.stock),
       category: product.category,
+      imageUrl: product.imageUrl,
       imageUrls: product.imageUrls ?? (product.imageUrl ? [product.imageUrl] : []),
+      imagePublicId: product.imagePublicId,
+      imagePublicIds: product.imagePublicIds ?? (product.imagePublicId ? [product.imagePublicId] : []),
       status: product.status,
     });
-    setImageUrls(product.imageUrls ?? (product.imageUrl ? [product.imageUrl] : []));
   };
 
   const handleDelete = async (productId: string) => {
@@ -108,7 +112,7 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
       await deleteProduct(productId);
       setProducts((current) => current.filter((product) => product.id !== productId));
       showNotification('Product deleted.', 'success');
-      if (editingProduct?.id === productId) resetForm();
+      if (form.id === productId) resetForm();
     } catch {
       showNotification('Unable to delete product.', 'error');
     } finally {
@@ -116,8 +120,19 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
     }
   };
 
-  const handleUploadSuccess = (imageUrl: string) => {
-    setImageUrls((current) => [...new Set([...current, imageUrl])]);
+  const handleUploadSuccess = (result: CloudinaryUploadWidgetResults) => {
+    const info = result.info as CloudinaryInfo;
+    if (!info.secure_url || !info.public_id) return;
+    const secureUrl = info.secure_url;
+    const publicId = info.public_id;
+
+    setForm((current) => ({
+      ...current,
+      imageUrl: current.imageUrl || secureUrl,
+      imageUrls: Array.from(new Set([...current.imageUrls, secureUrl])),
+      imagePublicId: current.imagePublicId || publicId,
+      imagePublicIds: Array.from(new Set([...current.imagePublicIds, publicId])),
+    }));
   };
 
   return (
@@ -126,24 +141,12 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
           <ProductFormCard
-            initialData={
-              editingProduct
-                ? {
-                    id: editingProduct.id,
-                    name: editingProduct.name,
-                    description: editingProduct.description,
-                    price: editingProduct.price,
-                    stock: editingProduct.stock,
-                    category: editingProduct.category,
-                    imageUrls: imageUrls,
-                    status: editingProduct.status,
-                  }
-                : undefined
-            }
+            form={form}
             loading={loading}
-            categories={productCategories}
+            onFieldChange={updateForm}
+            onStatusChange={(value) => setForm((current) => ({ ...current, status: value }))}
             onUploadSuccess={handleUploadSuccess}
-            onSubmit={handleFormSubmit}
+            onSubmit={handleSubmit}
             onClear={resetForm}
           />
         </Grid>

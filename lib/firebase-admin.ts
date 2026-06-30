@@ -1,6 +1,5 @@
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase/firestore';
 import z from 'zod';
 
 const firebaseAdminSecretSchema = z.object({

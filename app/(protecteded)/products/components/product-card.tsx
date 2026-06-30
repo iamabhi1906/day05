@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardActions, CardContent, CardMedia, Chip, IconButton, Stack, Typography } from '@mui/material';
+import { Button, Card, CardActions, CardContent, CardMedia, IconButton, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -9,6 +9,8 @@ import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { CartItemData } from '@/lib/crud/cart';
 import { ProductData } from '@/lib/crud/product';
 import { useState } from 'react';
+import styles from './product-card.module.css';
+import Image from 'next/image';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -28,69 +30,54 @@ export default function ProductCard({ product, cartItem, loading = false, onAddT
   const quantity = cartItem?.quantity ?? 0;
   const isInCart = Boolean(cartItem);
   const isOutOfStock = product.stock <= 0;
-
   const [currentDisplayImage, setCurrentDisplayImage] = useState<number>(0);
-
   const imageUrls = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : [product.imageUrl];
 
   return (
-    <Card variant="outlined" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card className={styles.card}>
       <CardMedia
         component="img"
+        className={styles.mainMedia}
         image={imageUrls[currentDisplayImage]}
         alt={product.name}
-        sx={{ height: 220, objectFit: 'cover', cursor: 'pointer' }}
         onClick={() => router.push(`/products/${product.id}`)}
       />
-      {imageUrls.length > 1 ? (
-        <Stack direction="row" spacing={1} sx={{ p: 1, overflowX: 'auto' }}>
-          {imageUrls.slice(0, 4).map((image, index) => (
-            <CardMedia
-              key={image}
-              component="img"
-              image={image}
-              onClick={() => {
-                setCurrentDisplayImage(index);
-              }}
-              alt={product.name}
-              sx={{ width: 72, height: 72, borderRadius: 1, flexShrink: 0, objectFit: 'cover' }}
-            />
-          ))}
-        </Stack>
-      ) : null}
-      <CardContent sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => router.push(`/products/${product.id}`)}>
-        <Stack spacing={1}>
-          <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 700, lineHeight: 1.2 }}>
+      <CardContent className={styles.cardContent}>
+        <Stack direction="column" spacing={1}>
+          {imageUrls.length > 0 ? (
+            <Stack direction="row" spacing={1}>
+              {imageUrls.slice(0, 4).map((image, index) => (
+                <Image
+                  key={image}
+                  className={`${styles.thumbnail} ${currentDisplayImage === index ? styles.thumbnailActive : ''}`}
+                  src={image}
+                  onClick={() => {
+                    setCurrentDisplayImage(index);
+                  }}
+                  width={1000}
+                  height={1000}
+                  alt={product.name}
+                />
+              ))}
+            </Stack>
+          ) : null}
+          <Stack spacing={1}>
+            <Typography variant="h6" className={styles.productName}>
               {product.name}
             </Typography>
-            <Chip label={product.category} size="small" color="primary" />
-          </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ minHeight: 48 }}>
-            {product.description}
-          </Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            <Typography variant="h6" className={styles.price}>
               {currency.format(product.price)}
             </Typography>
-            <Chip
-              label={isOutOfStock ? 'Out of stock' : `${product.stock} available`}
-              size="small"
-              color={isOutOfStock ? 'error' : product.stock <= 5 ? 'warning' : 'success'}
-            />
           </Stack>
-          <Typography variant="caption" color="text.secondary">
-            Sold by {product.vendorName}
-          </Typography>
         </Stack>
       </CardContent>
-      <CardActions sx={{ px: 2, pb: 2 }}>
+      <CardActions className={styles.cardActions}>
         {isInCart && cartItem ? (
-          <Stack spacing={1.5} sx={{ width: '100%' }} direction="row">
+          <Stack spacing={1.5} className={styles.cartActionsRow} direction="row">
             <Button variant="contained" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => router.push('/cart')} fullWidth>
               Buy now
             </Button>
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            <Stack direction="row" spacing={1} className={styles.quantityControls}>
               <IconButton
                 color="primary"
                 aria-label="decrease quantity"
@@ -99,7 +86,7 @@ export default function ProductCard({ product, cartItem, loading = false, onAddT
               >
                 <RemoveIcon />
               </IconButton>
-              <Typography variant="body1" sx={{ minWidth: 24, textAlign: 'center' }}>
+              <Typography variant="body1" className={styles.quantityText}>
                 {quantity}
               </Typography>
               <IconButton

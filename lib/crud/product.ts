@@ -12,6 +12,8 @@ import {
   serverTimestamp,
   updateDoc,
   where,
+  startAfter,
+  limit,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -101,10 +103,32 @@ export const getVendorProducts = async (vendorEmail: string): Promise<ProductDat
   return snapshot.docs.map(productFromDoc);
 };
 
-export const getPublishedProducts = async (): Promise<ProductData[]> => {
-  const q = query(productsCollection, where('status', '==', 'published'), orderBy('createdAt', 'desc'));
+export const getPublishedProducts = async ({
+  limit: pageSize = 10,
+  search,
+  lastDocId,
+}: {
+  limit?: number;
+  search?: string;
+  lastDocId?: string | null;
+}): Promise<{ data: ProductData[]; lastDocId: string | null }> => {
+  let q = query(productsCollection, where('status', '==', 'published'), orderBy('createdAt', 'desc'), limit(pageSize));
+  if (lastDocId) {
+    const docRef = doc(productsCollection, lastDocId);
+    const docSnapshot = await getDoc(docRef);
+    if (docSnapshot.exists()) {q = query(q, startAfter(docSnapshot));}
+  }
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(productFromDoc);
+  let data = snapshot.docs.map(productFromDoc);
+  if (search) {
+    const s = search.toLowerCase();
+    data = data.filter((p) => p.name.toLowerCase().includes(s) || p.description?.toLowerCase().includes(s) || p.category?.toLowerCase().includes(s));
+  }
+  const lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+  return {
+    data,
+    lastDocId: lastVisibleDoc ? lastVisibleDoc.id : null,
+  };
 };
 
 export const getProduct = async (productId: string): Promise<ProductData | null> => {

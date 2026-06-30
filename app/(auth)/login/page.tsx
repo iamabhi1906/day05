@@ -11,7 +11,7 @@ import { EmailLogin } from './login';
 import { GoogleLogin } from '../auth-session';
 import Link from 'next/link';
 import { LoginSchema, LoginFormData } from '@/lib/schemas/auth.schema';
-import { RHFTextField } from '@/components/form-components';
+import InputField from '@/components/input-filed';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -43,7 +43,8 @@ export default function LoginPage() {
     formState: { isValid },
   } = useForm<LoginFormData>({
     resolver: zodResolver(LoginSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
     defaultValues: {
       email: '',
       password: '',
@@ -112,8 +113,8 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(handleEmailLogin)}>
             <Stack spacing={2}>
-              <RHFTextField name="email" control={control} label="Email address" type="email" placeholder="you@example.com" />
-              <RHFTextField name="password" control={control} label="Password" type="password" placeholder="••••••••" />
+              <InputField name="email" control={control} label="Email address" type="email"  />
+              <InputField name="password" control={control} label="Password" type="password"/>
             </Stack>
 
             <Button variant="contained" fullWidth type="submit" disabled={loading || !isValid} sx={{ mt: 3 }}>

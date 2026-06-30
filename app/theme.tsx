@@ -2,7 +2,7 @@
 import { CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-const theme = createTheme({
+export const theme = createTheme({
   cssVariables: true,
   palette: {
     mode: 'light',

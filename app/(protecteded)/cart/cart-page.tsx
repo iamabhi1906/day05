@@ -5,8 +5,7 @@ import {
   Alert,
   Box,
   Button,
-  CardMedia,
-  IconButton,
+  Container,
   Paper,
   Snackbar,
   Stack,
@@ -19,12 +18,11 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PaymentIcon from '@mui/icons-material/Payment';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { CartItemData, removeCartItem, updateCartItemQuantity } from '@/lib/crud/cart';
 import { placeOrder } from '@/lib/crud/order';
 import { UserData } from '@/lib/crud/user';
+import styles from './cart-page.module.css';
+import Image from 'next/image';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -40,7 +38,7 @@ export default function CartPage({ initialItems, user }: { initialItems: CartIte
     severity: 'success' as 'success' | 'error',
   });
 
-  const total = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price * item.quantity, 0), [items]);
 
   const changeQuantity = async (item: CartItemData, quantity: number) => {
     const safeQuantity = Math.max(1, quantity);
@@ -71,82 +69,100 @@ export default function CartPage({ initialItems, user }: { initialItems: CartIte
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Stack direction="row" spacing={1.5} sx={{ mb: 3, alignItems: 'center' }}>
-        <ShoppingCartIcon color="primary" />
-        <Typography variant="h5">Cart</Typography>
-      </Stack>
+    <div className={styles.cartPage}>
+      <Box component={'header'} className={styles.header}>
+        <Typography variant="h6">My Shopping Bag</Typography>
+      </Box>
 
-      <TableContainer component={Paper} variant="outlined">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Product</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>Total</TableCell>
-              <TableCell align="right">Remove</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {items.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-                    <CardMedia component="img" image={item.productImageUrl} alt={item.productName} sx={{ width: 56, height: 56, borderRadius: 1 }} />
-                    <Typography variant="subtitle2">{item.productName}</Typography>
-                  </Stack>
-                </TableCell>
-                <TableCell>{currency.format(item.price)}</TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    size="small"
-                    value={item.quantity}
-                    onChange={(event) => changeQuantity(item, Number(event.target.value))}
-                    slotProps={{ htmlInput: { min: 1 } }}
-                    sx={{ width: 96 }}
-                  />
-                </TableCell>
-                <TableCell>{currency.format(item.price * item.quantity)}</TableCell>
-                <TableCell align="right">
-                  <IconButton color="error" onClick={() => removeItem(item.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-            {items.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5}>
-                  <Stack sx={{ py: 5, alignItems: 'center' }}>
-                    <Typography color="text.secondary">Your cart is empty.</Typography>
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ) : null}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Box className={styles.content}>
+        <Container component={'section'} className={styles.cartItems}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow className={styles.cartHeader}>
+                  <TableCell>Product</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Total</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items.length > 0 ? (
+                  items.map((item) => (
+                    <TableRow key={item.id} className={styles.cartRow}>
+                      <TableCell className={styles.productCell}>
+                        <Box className={styles.productCellInner}>
+                          <Image src={item.productImageUrl} width={1000} height={1000} alt={item.productName} className={styles.productImage} />
+                          <Stack>
+                            <Typography variant="h6">{item.productName}</Typography>
+                            <Typography color="secondary">Item no: {item.productId}</Typography>
+                            <Typography color="secondary">Qty: {item.quantity}</Typography>
+                            <div className={styles.productActions}>
+                              <Button className={styles.actionButton} onClick={() => removeItem(item.id)}>
+                                Remove
+                              </Button>
+                              <Button className={styles.actionButton} onClick={() => changeQuantity(item, item.quantity)}>
+                                Edit
+                              </Button>
+                            </div>
+                          </Stack>
+                        </Box>
+                      </TableCell>
+                      <TableCell className={styles.priceCell}>{currency.format(item.price)}</TableCell>
+                      <TableCell className={styles.totalCell}>{currency.format(item.price * item.quantity)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3}>
+                      <Typography className={styles.emptyMessage}>Your cart is empty.</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Container>
 
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
-        sx={{ mt: 3, justifyContent: 'flex-end', alignItems: { xs: 'stretch', sm: 'center' } }}
-      >
-        <Typography variant="h6">Total: {currency.format(total)}</Typography>
-        <Button variant="contained" startIcon={<PaymentIcon />} disabled={loading || items.length === 0} onClick={checkout}>
-          Place order
-        </Button>
-      </Stack>
+        <aside className={styles.summary}>
+          <Typography className={styles.summaryTitle}>Summary</Typography>
+          <Stack>
+            <Typography className={styles.promoLabel}>Do you have a promo code?</Typography>
+            <Stack className={styles.promoForm} direction={'row'}>
+              <TextField className={styles.promoInput} placeholder="Enter promo code" size="small" />
+              <Button type="button" className={styles.applyButton} variant="contained">
+                Apply
+              </Button>
+            </Stack>
+          </Stack>
 
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={4000}
-        onClose={() => setNotification((current) => ({ ...current, open: false }))}
-      >
+          <Stack className={`${styles.summaryLine} ${styles.light}`} direction={'row'}>
+            <Typography>Subtotal</Typography>
+            <Typography>{currency.format(subtotal)}</Typography>
+          </Stack>
+          <Stack className={styles.summaryLine} direction={'row'}>
+            <Typography>Shipping</Typography>
+            <Typography>TBD</Typography>
+          </Stack>
+          <Stack className={styles.summaryLine} direction={'row'}>
+            <Typography>Sales Tax</Typography>
+            <Typography>{currency.format(0)}</Typography>
+          </Stack>
+          <Stack className={styles.estimateTotal} direction={'row'}>
+            <Typography>Estimated Total</Typography>
+            <Typography>{currency.format(subtotal)}</Typography>
+          </Stack>
+
+          <Button type="button" className={styles.checkoutButton} disabled={loading || items.length === 0} onClick={checkout} variant="contained">
+            Checkout
+          </Button>
+
+          <Typography className={styles.helpText}>Need help? Call us at 91-6201478596</Typography>
+        </aside>
+      </Box>
+
+      <Snackbar open={notification.open} autoHideDuration={4000} onClose={() => setNotification((current) => ({ ...current, open: false }))}>
         <Alert severity={notification.severity}>{notification.message}</Alert>
       </Snackbar>
-    </Box>
+    </div>
   );
 }

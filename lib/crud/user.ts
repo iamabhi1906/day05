@@ -14,6 +14,14 @@ export interface UserData {
   isBlocked: boolean;
 }
 
+const toDateValue = (value: unknown) => {
+  if (value instanceof Date) return value;
+  if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as { toDate?: () => Date }).toDate === 'function') {
+    return (value as { toDate: () => Date }).toDate();
+  }
+  return new Date();
+};
+
 export const createUser = async (user: UserInfo, role: string | null, name?: string) => {
   if (!user.email) return;
   const normalizedName = name?.trim() || user.displayName || null;
@@ -56,14 +64,14 @@ export const getUserByEmail = async (email: string): Promise<UserData | null> =>
     const userDoc = result.docs[0];
     const data = userDoc.data();
     return {
-      id: data.id,
+      id: userDoc.id,
       email: data.email,
       role: data.role,
       uid: data.uid,
       name: data.name,
       avatar: data.avatar,
       phone: data.phone,
-      createdAt: data.createdAt.toDate(),
+      createdAt: toDateValue(data.createdAt),
       isBlocked: data.isBlocked,
     };
   } catch (error) {
@@ -81,7 +89,7 @@ export const updateUserByEmail = async (
     const q = query(usersRef, where('email', '==', email));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) {
-      throw new Error('No User Found.!!')
+      throw new Error('No User Found.!!');
     }
 
     const userDoc = querySnapshot.docs[0];
@@ -99,7 +107,7 @@ export const updateUserByEmail = async (
       name: data.name,
       avatar: data.avatar,
       phone: data.phone,
-      createdAt: data.createdAt?.toDate() || new Date(),
+      createdAt: toDateValue(data.createdAt),
       isBlocked: data.isBlocked,
     };
   } catch (error) {

@@ -14,12 +14,14 @@ const buyerPages = [
   { label: 'Products', href: '/products', icon: <LocalMallIcon fontSize="small" /> },
   { label: 'Cart', href: '/cart', icon: <ShoppingCartIcon fontSize="small" /> },
   { label: 'Orders', href: '/orders', icon: <ReceiptLongIcon fontSize="small" /> },
+  { label: 'Profile', href: '/profile', icon: <ReceiptLongIcon fontSize="small" /> },
 ];
 
 const vendorPages = [
   { label: 'Products', href: '/products', icon: <LocalMallIcon fontSize="small" /> },
   { label: 'Manage', href: '/vendor/products', icon: <InventoryIcon fontSize="small" /> },
   { label: 'Orders', href: '/vendor/orders', icons: <ReceiptLong fontSize="small" /> },
+  { label: 'Profile', href: '/profile', icon: <ReceiptLongIcon fontSize="small" /> },
 ];
 
 export default function NavigationMenu({ user }: { user?: UserData }) {

@@ -12,9 +12,9 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   if (!user) redirect('/login');
   if (user.role == null) return <UserRoleSelect user={user} />;
   return (
-    <>
+    <div style={{ height: '100%' }}>
       <NavigationBar user={user} />
       {children}
-    </>
+    </div>
   );
 }
