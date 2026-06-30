@@ -2,12 +2,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import GoogleIcon from '@mui/icons-material/Google';
-import { Alert, Box, Button, Card, CardContent, Divider, Snackbar, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Divider, Snackbar, Stack, Typography } from '@mui/material';
 import styles from './login.module.css';
 import { EmailLogin } from './login';
 import { GoogleLogin } from '../auth-session';
 import Link from 'next/link';
+import { LoginSchema, LoginFormData } from '@/lib/schemas/auth.schema';
+import { RHFTextField } from '@/components/form-components';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -26,13 +30,24 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<NotificationState>({
     open: false,
     message: '',
     severity: NotificationSeverity.SUCCESS,
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(LoginSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
   const showNotification = (message: string, severity: NotificationSeverity) => {
@@ -57,10 +72,10 @@ export default function LoginPage() {
     }
   };
 
-  const handleEmailLogin = async () => {
+  const handleEmailLogin = async (data: LoginFormData) => {
     try {
       setLoading(true);
-      await EmailLogin(email, password);
+      await EmailLogin(data.email, data.password);
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
       router.push('/dashboard');
     } catch (error: unknown) {
@@ -95,34 +110,20 @@ export default function LoginPage() {
             <Divider className={styles.divider} />
           </Box>
 
-          <Stack spacing={2}>
-            <TextField
-              label="Email address"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              fullWidth
-              disabled={loading}
-              autoComplete="email"
-            />
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              fullWidth
-              disabled={loading}
-              autoComplete="current-password"
-            />
-          </Stack>
+          <form onSubmit={handleSubmit(handleEmailLogin)}>
+            <Stack spacing={2}>
+              <RHFTextField name="email" control={control} label="Email address" type="email" placeholder="you@example.com" />
+              <RHFTextField name="password" control={control} label="Password" type="password" placeholder="••••••••" />
+            </Stack>
 
-          <Button variant="contained" fullWidth onClick={handleEmailLogin} disabled={loading}>
-            {loading ? 'Signing in...' : 'Login with Email'}
-          </Button>
+            <Button variant="contained" fullWidth type="submit" disabled={loading || !isValid} sx={{ mt: 3 }}>
+              {loading ? 'Signing in...' : 'Login with Email'}
+            </Button>
+          </form>
 
           <Box className={styles.signupLink}>
             <Typography variant="body2">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/signup" className={styles.link}>
                 Sign up
               </Link>

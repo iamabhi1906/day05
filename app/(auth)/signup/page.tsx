@@ -2,25 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import GoogleIcon from '@mui/icons-material/Google';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  Snackbar,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, Divider, Snackbar, Stack, Typography } from '@mui/material';
 import styles from './signup.module.css';
 import { EmailSignup } from './signup';
 import Link from 'next/link';
+import { SignupSchema, SignupFormData } from '@/lib/schemas/auth.schema';
+import { RHFTextField, RHFRadioGroup } from '@/components/form-components';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -33,24 +23,33 @@ type NotificationState = {
   severity: NotificationSeverity;
 };
 
-type UserRole = 'user' | 'vendor';
-
 const getErrorMessage = (error: unknown, fallback: string) => {
   return error instanceof Error ? error.message : fallback;
 };
 
 export default function SignupPage() {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('user');
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<NotificationState>({
     open: false,
     message: '',
     severity: NotificationSeverity.SUCCESS,
+  });
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(SignupSchema),
+    mode: 'onChange',
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      role: 'user',
+    },
   });
 
   const showNotification = (message: string, severity: NotificationSeverity) => {
@@ -61,13 +60,10 @@ export default function SignupPage() {
     setNotification((prev) => ({ ...prev, open: false }));
   };
 
-  const handleEmailSignup = async () => {
+  const handleEmailSignup = async (data: SignupFormData) => {
     try {
-      if (password !== confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
       setLoading(true);
-      await EmailSignup(name, email, password, role);
+      await EmailSignup(data.name, data.email, data.password, data.role);
       showNotification('Signup success!', NotificationSeverity.SUCCESS);
       router.push('/dashboard');
     } catch (error: unknown) {
@@ -95,57 +91,31 @@ export default function SignupPage() {
               <Typography variant="subtitle2" className={styles.roleLabel}>
                 Select Your Role
               </Typography>
-              <RadioGroup row value={role} onChange={(e) => setRole(e.target.value as UserRole)} className={styles.radioGroup}>
-                <FormControlLabel value="user" control={<Radio />} label="Buyer" disabled={loading} />
-                <FormControlLabel value="vendor" control={<Radio />} label="Vendor" disabled={loading} />
-              </RadioGroup>
+              <RHFRadioGroup
+                name="role"
+                control={control}
+                options={[
+                  { value: 'user', label: 'Buyer' },
+                  { value: 'vendor', label: 'Vendor' },
+                ]}
+                row
+              />
             </Box>
 
             <Divider />
 
-            <Stack spacing={2}>
-              <TextField
-                label="Your name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                fullWidth
-                disabled={loading}
-                autoComplete="name"
-              />
-              <TextField
-                label="Email address"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                fullWidth
-                disabled={loading}
-                autoComplete="email"
-              />
-              <TextField
-                label="Password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                fullWidth
-                disabled={loading}
-                autoComplete="new-password"
-                helperText="At least 6 characters"
-              />
-              <TextField
-                label="Confirm Password"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                fullWidth
-                disabled={loading}
-                autoComplete="new-password"
-              />
-            </Stack>
+            <form onSubmit={handleSubmit(handleEmailSignup)}>
+              <Stack spacing={2}>
+                <RHFTextField name="name" control={control} label="Your name" type="text" placeholder="John Doe" />
+                <RHFTextField name="email" control={control} label="Email address" type="email" placeholder="you@example.com" />
+                <RHFTextField name="password" control={control} label="Password" type="password" placeholder="••••••••" />
+                <RHFTextField name="confirmPassword" control={control} label="Confirm Password" type="password" placeholder="••••••••" />
+              </Stack>
 
-            <Button variant="contained" fullWidth onClick={handleEmailSignup} disabled={loading}>
-              {loading ? 'Creating Account...' : 'Sign Up'}
-            </Button>
+              <Button variant="contained" fullWidth type="submit" disabled={loading || !isValid} sx={{ mt: 3 }}>
+                {loading ? 'Creating Account...' : 'Sign Up'}
+              </Button>
+            </form>
 
             <Box className={styles.dividerWrapper}>
               <Divider className={styles.divider} />
