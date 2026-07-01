@@ -1,5 +1,4 @@
 import UserRoleSelect from '@/components/role-selector';
-import NavigationBar from '@/components/navigation-bar';
 import { getSession } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/crud/user';
 import { redirect } from 'next/navigation';
@@ -13,7 +12,6 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   if (user.role == null) return <UserRoleSelect user={user} />;
   return (
     <div style={{ height: '100%' }}>
-      <NavigationBar user={user} />
       {children}
     </div>
   );

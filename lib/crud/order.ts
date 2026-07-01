@@ -1,6 +1,7 @@
 import { addDoc, collection, DocumentData, getDocs, orderBy, query, QueryDocumentSnapshot, serverTimestamp, where } from 'firebase/firestore';
 import { db } from '../firebase';
-import { CartItemData, clearCart } from './cart';
+import { clearCart } from './cart';
+import { CartData } from '@/features/cart/cart.types';
 
 export interface OrderItemData {
   productId: string;
@@ -39,7 +40,7 @@ const orderFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): OrderData 
   };
 };
 
-export const placeOrder = async (buyerEmail: string, cartItems: CartItemData[]) => {
+export const placeOrder = async (buyerEmail: string, cartItems: CartData[]) => {
   if (cartItems.length === 0) {
     throw new Error('Cart is empty');
   }
@@ -47,7 +48,7 @@ export const placeOrder = async (buyerEmail: string, cartItems: CartItemData[]) 
   const items: OrderItemData[] = cartItems.map((item) => ({
     productId: item.productId,
     productName: item.productName,
-    productImageUrl: item.productImageUrl,
+    productImageUrl: item.productImageUrl ?? '',
     vendorEmail: item.vendorEmail,
     price: item.price,
     quantity: item.quantity,

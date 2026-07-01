@@ -10,16 +10,16 @@ export interface UserData {
   name: string | null;
   avatar: string | null;
   phone: string | null;
-  createdAt: Date;
+  createdAt: string;
   isBlocked: boolean;
 }
 
 const toDateValue = (value: unknown) => {
-  if (value instanceof Date) return value;
+  if (value instanceof Date) return value.toISOString();
   if (typeof value === 'object' && value !== null && 'toDate' in value && typeof (value as { toDate?: () => Date }).toDate === 'function') {
-    return (value as { toDate: () => Date }).toDate();
+    return (value as { toDate: () => Date }).toDate().toISOString();
   }
-  return new Date();
+  return new Date().toISOString();
 };
 
 export const createUser = async (user: UserInfo, role: string | null, name?: string) => {
@@ -34,7 +34,7 @@ export const createUser = async (user: UserInfo, role: string | null, name?: str
       name: normalizedName,
       avatar: user.photoURL,
       phone: user.phoneNumber,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
       isBlocked: false,
     };
     const docRef = await addDoc(collection(db, 'users'), newUser);

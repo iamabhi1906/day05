@@ -14,28 +14,12 @@ import {
   where,
   startAfter,
   limit,
+  QueryConstraint,
 } from 'firebase/firestore';
 import { db } from '../firebase';
+import { GetPublishedProductsParams, ProductData, ProductSortByOptions } from '@/features/product/product.types';
 
 export type ProductStatus = 'draft' | 'published';
-
-export interface ProductData {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  imageUrl: string;
-  imageUrls: string[];
-  imagePublicId: string;
-  imagePublicIds: string[];
-  status: ProductStatus;
-  vendorEmail: string;
-  vendorName: string;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-}
 
 export type ProductInput = Omit<ProductData, 'id' | 'createdAt' | 'updatedAt'>;
 
@@ -104,27 +88,47 @@ export const getVendorProducts = async (vendorEmail: string): Promise<ProductDat
 };
 
 export const getPublishedProducts = async ({
-  limit: pageSize = 10,
+  limit: pageSize = 12,
   search,
   lastDocId,
-}: {
-  limit?: number;
-  search?: string;
-  lastDocId?: string | null;
-}): Promise<{ data: ProductData[]; lastDocId: string | null }> => {
-  let q = query(productsCollection, where('status', '==', 'published'), orderBy('createdAt', 'desc'), limit(pageSize));
+  category,
+  sortBy,
+}: GetPublishedProductsParams): Promise<{ data: ProductData[]; lastDocId: string | null }> => {
+  let constraints: QueryConstraint[] = [where('status', '==', 'published')];
+
+  if (category) {
+    constraints.push(where('category', '==', category));
+  }
+
+  if (search) {
+    const searchLower = search.toLowerCase();
+    constraints.push(where('name_lowercase', '>=', searchLower));
+    constraints.push(where('name_lowercase', '<=', searchLower + '\uf8ff'));
+    constraints.push(orderBy('name_lowercase', 'asc'));
+    console.log(constraints);
+  }
+
+  if (!search && sortBy && sortBy.field) {
+    constraints.push(orderBy(sortBy.field, sortBy.order));
+  } else if (!search) {
+    constraints.push(orderBy('createdAt', 'desc'));
+  }
+
   if (lastDocId) {
     const docRef = doc(productsCollection, lastDocId);
     const docSnapshot = await getDoc(docRef);
-    if (docSnapshot.exists()) {q = query(q, startAfter(docSnapshot));}
+    if (docSnapshot.exists()) {
+      constraints.push(startAfter(docSnapshot));
+    }
   }
+  constraints.push(limit(pageSize));
+
+  const q = query(productsCollection, ...constraints);
   const snapshot = await getDocs(q);
-  let data = snapshot.docs.map(productFromDoc);
-  if (search) {
-    const s = search.toLowerCase();
-    data = data.filter((p) => p.name.toLowerCase().includes(s) || p.description?.toLowerCase().includes(s) || p.category?.toLowerCase().includes(s));
-  }
+
+  const data = snapshot.docs.map(productFromDoc);
   const lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+
   return {
     data,
     lastDocId: lastVisibleDoc ? lastVisibleDoc.id : null,

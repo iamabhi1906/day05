@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Container, Grid, Stack, Alert, Snackbar } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { ProductData } from '@/lib/crud/product';
 import { CartItemData, addProductToCart, getCartItems, updateCartItemQuantity } from '@/lib/crud/cart';
 import { UserData } from '@/lib/crud/user';
 import ProductImageGallery from './components/product-image-gallery';
 import ProductDetailInfo from './components/product-detail-info';
 import ProductQuantityControls from './components/product-quantity-controls';
+import { ProductData } from '@/features/product/product.types';
 
 interface ProductDetailPageProps {
   product: ProductData;

@@ -12,6 +12,10 @@ import { GoogleLogin } from '../auth-session';
 import Link from 'next/link';
 import { LoginSchema, LoginFormData } from '@/lib/schemas/auth.schema';
 import InputField from '@/components/input-filed';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/app/store';
+import { setUserData } from '@/features/user/user.slice';
+import { UserData, UserSchema } from '@/features/user/user.types';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -30,6 +34,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 
 export default function LoginPage() {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<NotificationState>({
     open: false,
@@ -62,8 +67,9 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true);
-      await GoogleLogin();
+      const user = await GoogleLogin();
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
+      dispatch(setUserData(UserSchema.parse(user)));
       router.push('/dashboard');
     } catch (error: unknown) {
       console.error(error);
@@ -76,10 +82,13 @@ export default function LoginPage() {
   const handleEmailLogin = async (data: LoginFormData) => {
     try {
       setLoading(true);
-      await EmailLogin(data.email, data.password);
+      const user = await EmailLogin(data.email, data.password);
+      if (!user) return;
+      dispatch(setUserData(user));
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
       router.push('/dashboard');
     } catch (error: unknown) {
+      console.log(error);
       showNotification(getErrorMessage(error, 'Login Failed'), NotificationSeverity.ERROR);
     } finally {
       setLoading(false);
@@ -113,8 +122,8 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit(handleEmailLogin)}>
             <Stack spacing={2}>
-              <InputField name="email" control={control} label="Email address" type="email"  />
-              <InputField name="password" control={control} label="Password" type="password"/>
+              <InputField name="email" control={control} label="Email address" type="email" />
+              <InputField name="password" control={control} label="Password" type="password" />
             </Stack>
 
             <Button variant="contained" fullWidth type="submit" disabled={loading || !isValid} sx={{ mt: 3 }}>

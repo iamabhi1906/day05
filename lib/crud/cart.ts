@@ -12,7 +12,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { ProductData } from './product';
+import { ProductData } from '@/features/product/product.types';
 
 export interface CartItemData {
   id: string;
@@ -23,13 +23,14 @@ export interface CartItemData {
   vendorEmail: string;
   price: number;
   quantity: number;
-  addedAt: Date | null;
+  addedAt: string | null;
 }
 
 const cartCollection = collection(db, 'cartItems');
 
 const toDate = (value: { toDate?: () => Date } | null | undefined) => {
-  return typeof value?.toDate === 'function' ? value.toDate() : null;
+  const d = typeof value?.toDate === 'function' ? value.toDate() : null;
+  return d ? d.toISOString() : null;
 };
 
 const cartItemFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): CartItemData => {
@@ -57,7 +58,6 @@ export const getCartItems = async (buyerEmail: string): Promise<CartItemData[]> 
 export const addProductToCart = async (buyerEmail: string, product: ProductData) => {
   const q = query(cartCollection, where('buyerEmail', '==', buyerEmail), where('productId', '==', product.id));
   const snapshot = await getDocs(q);
-
   if (!snapshot.empty) {
     const cartItem = snapshot.docs[0];
     const quantity = Number(cartItem.data().quantity || 0) + 1;

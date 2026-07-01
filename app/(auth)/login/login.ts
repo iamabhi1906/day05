@@ -2,13 +2,18 @@ import { auth } from '@/lib/firebase';
 import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { createSession } from '../auth-session';
+import { getUserByEmail } from '@/lib/crud/user';
+import { UserData, UserSchema } from '@/features/user/user.types';
 
-export const EmailLogin = async (email: string, password: string): Promise<string | null> => {
+export const EmailLogin = async (email: string, password: string): Promise<UserData | null> => {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     const idToken = await result.user.getIdToken();
     await createSession(idToken);
-    return null;
+    if (!result.user.email) return null;
+    const user = await getUserByEmail(result.user.email);
+    console.log(UserSchema.parse(user));
+    return UserSchema.parse(user);
   } catch (error: unknown) {
     let message = 'Login failed';
     if (error instanceof FirebaseError) {

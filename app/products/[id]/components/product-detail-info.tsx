@@ -2,7 +2,7 @@
 
 import { Box, Chip, Grid, Stack, Typography } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import { ProductData } from '@/lib/crud/product';
+import { ProductData } from '@/features/product/product.types';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -31,13 +31,7 @@ export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
             {currency.format(product.price)}
           </Typography>
           <Chip
-            label={
-              isOutOfStock
-                ? 'Out of Stock'
-                : product.stock <= 5
-                ? `Only ${product.stock} left`
-                : `${product.stock} in stock`
-            }
+            label={isOutOfStock ? 'Out of Stock' : product.stock <= 5 ? `Only ${product.stock} left` : `${product.stock} in stock`}
             color={isOutOfStock ? 'error' : product.stock <= 5 ? 'warning' : 'success'}
             size="small"
           />

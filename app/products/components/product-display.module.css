@@ -1,0 +1,36 @@
+.layout {
+  align-items: flex-start;
+}
+
+.sidebarColumn {
+  width: 260px;
+  flex-shrink: 0;
+}
+
+.contentColumn {
+  flex: 1;
+  min-width: 0;
+}
+
+.resultsText {
+  margin-bottom: 1rem;
+  color: #616161;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.endMessage {
+  text-align: center;
+  padding: 1rem 0 0;
+  color: #d32f2f;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 2rem 0;
+  color: #616161;
+}

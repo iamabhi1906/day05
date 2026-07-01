@@ -16,6 +16,7 @@
     "@mui/icons-material": "^9.1.1",
     "@mui/material": "^9.1.2",
     "@mui/material-nextjs": "^9.1.1",
+    "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.18.1",
     "dotenv": "^17.4.2",
     "firebase": "^12.15.0",
@@ -26,6 +27,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.80.0",
     "react-infinite-scroll-component": "^7.2.1",
+    "react-redux": "^9.3.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -27,7 +27,11 @@ export default function ProductQuantityControls({
 }: ProductQuantityControlsProps) {
   if (cartItem) {
     return (
-      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', justifyContent: 'space-between', border: '1px solid', borderColor: 'divider', borderRadius: 2, px: 2, py: 1.5 }}>
+      <Stack
+        direction="row"
+        spacing={1.5}
+        sx={{ alignItems: 'center', justifyContent: 'space-between', border: '1px solid', borderColor: 'divider', borderRadius: 2, px: 2, py: 1.5 }}
+      >
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
           Quantity
         </Typography>
@@ -57,14 +61,7 @@ export default function ProductQuantityControls({
   }
 
   return (
-    <Button
-      variant="contained"
-      size="large"
-      startIcon={<AddShoppingCartIcon />}
-      onClick={onAddToCart}
-      disabled={isOutOfStock || adding}
-      fullWidth
-    >
+    <Button variant="contained" size="large" startIcon={<AddShoppingCartIcon />} onClick={onAddToCart} disabled={isOutOfStock || adding} fullWidth>
       {adding ? 'Adding...' : 'Add to Cart'}
     </Button>
   );

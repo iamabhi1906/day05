@@ -1,0 +1,21 @@
+.sidebar {
+  padding: 1rem;
+  border-radius: 1rem;
+  height: 90dvh;
+}
+
+.title {
+  font-weight: 700;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.categoryButton {
+  border-radius: 0.75rem;
+  margin-bottom: 0.25rem;
+  gap: 2;
+}
