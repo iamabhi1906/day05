@@ -1,4 +1,5 @@
-import type { ProductData, ProductStatus } from '@/lib/crud/product';
+import { ProductData } from '@/features/product/product.types';
+import type { ProductStatus } from '@/lib/crud/product';
 
 export type ProductFormState = {
   id: string | null;

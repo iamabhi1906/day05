@@ -13,7 +13,7 @@ export const cartItemFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): 
     buyerEmail: data.buyerEmail,
     productId: data.productId,
     productName: data.productName,
-    productImageUrl: data.productImageUrl,
+    productImageUrls: data.productImageUrls,
     vendorEmail: data.vendorEmail,
     price: Number(data.price || 0),
     quantity: Number(data.quantity || 0),

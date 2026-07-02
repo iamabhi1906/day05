@@ -53,19 +53,17 @@ export const ProductSchema = z.object({
     .min(10, { error: 'Description must be at least 10 characters long' })
     .max(300, { error: 'Description cannot exceed 300 characters' }),
 
-  price: z
+  price: z.coerce
     .number({ error: 'Price is required' })
     .min(1, { error: 'Price must be at least 1' })
     .max(1000000, { error: 'Price cannot exceed 1000000' }),
 
-  stock: z
+  stock: z.coerce
     .number({ error: 'Stock quantity is required' })
     .min(10, { error: 'Minimum initial stock must be 10 units' })
     .max(10000, { error: 'Stock cannot exceed 10,000 units' }),
 
   category: z.enum(ProductCategory, { error: 'Please select a valid product category' }),
-
-  imageUrl: z.url({ error: 'Main image must be a valid URL' }).nullable().optional(),
 
   imageUrls: z
     .array(z.url({ error: 'Each item must be a valid image URL' }), {
@@ -74,15 +72,7 @@ export const ProductSchema = z.object({
     .min(1, { error: 'You must provide at least 1 product image' })
     .max(10, { error: 'You cannot upload more than 10 product images' }),
 
-  imagePublicId: z.string().nullable().optional(),
-
-  imagePublicIds: z
-    .array(z.string({ error: 'Public ID must be a string' }))
-    .min(1, { error: 'At least one image public ID is required' })
-    .max(10, { error: 'Maximum of 10 image public IDs allowed' }),
-
   status: z.enum(ProductStatus, { error: 'Please select a valid product status' }),
-
   vendorEmail: z.email({ error: 'Please enter a valid vendor email address' }),
 
   vendorName: z.string({ error: 'Vendor name is required' }).min(2, { error: 'Vendor name must be at least 2 characters long' }),
@@ -92,7 +82,24 @@ export const ProductSchema = z.object({
   updatedAt: z.coerce.date().nullable().optional(),
 });
 
+export const ProductInputSchema = ProductSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const ProductEditSchema = ProductInputSchema.omit({
+  vendorEmail: true,
+  vendorName: true,
+});
+
 export type ProductData = z.infer<typeof ProductSchema>;
+export type ProductInput = z.infer<typeof ProductInputSchema>;
+export type ProductFormDataInput = z.input<typeof ProductInputSchema>;
+export type ProductFormDataOutput = z.output<typeof ProductInputSchema>;
+export type ProductEditInput = z.input<typeof ProductEditSchema>;
+export type ProductEditOutput = z.output<typeof ProductEditSchema>;
+export type ProductEdit = z.infer<typeof ProductEditSchema>;
 
 export interface ProductState {
   products: ProductData[];

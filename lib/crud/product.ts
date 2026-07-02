@@ -17,11 +17,9 @@ import {
   QueryConstraint,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { GetPublishedProductsParams, ProductData, ProductSortByOptions } from '@/features/product/product.types';
+import { GetPublishedProductsParams, ProductData, ProductEdit, ProductInput } from '@/features/product/product.types';
 
 export type ProductStatus = 'draft' | 'published';
-
-export type ProductInput = Omit<ProductData, 'id' | 'createdAt' | 'updatedAt'>;
 
 const productsCollection = collection(db, 'products');
 
@@ -36,11 +34,6 @@ const productFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): ProductD
     : data.imageUrl
       ? [data.imageUrl]
       : [];
-  const imagePublicIds = Array.isArray(data.imagePublicIds)
-    ? data.imagePublicIds.filter((value) => typeof value === 'string' && value.length > 0)
-    : data.imagePublicId
-      ? [data.imagePublicId]
-      : [];
 
   return {
     id: snapshot.id,
@@ -49,10 +42,7 @@ const productFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): ProductD
     price: Number(data.price || 0),
     stock: Number(data.stock || 0),
     category: data.category,
-    imageUrl: imageUrls[0] || data.imageUrl || '',
     imageUrls,
-    imagePublicId: imagePublicIds[0] || data.imagePublicId || '',
-    imagePublicIds,
     status: data.status,
     vendorEmail: data.vendorEmail,
     vendorName: data.vendorName,
@@ -70,7 +60,7 @@ export const createProduct = async (product: ProductInput) => {
   return docRef.id;
 };
 
-export const updateProduct = async (productId: string, product: Partial<ProductInput>) => {
+export const updateProduct = async (productId: string, product: ProductEdit) => {
   await updateDoc(doc(db, 'products', productId), {
     ...product,
     updatedAt: serverTimestamp(),
@@ -94,7 +84,7 @@ export const getPublishedProducts = async ({
   category,
   sortBy,
 }: GetPublishedProductsParams): Promise<{ data: ProductData[]; lastDocId: string | null }> => {
-  let constraints: QueryConstraint[] = [where('status', '==', 'published')];
+  const constraints: QueryConstraint[] = [where('status', '==', 'published')];
 
   if (category) {
     constraints.push(where('category', '==', category));

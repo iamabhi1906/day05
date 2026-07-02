@@ -11,6 +11,7 @@ export async function getSession(): Promise<DecodedIdToken | null> {
     const decodedToken = await adminAuth.verifyIdToken(session, true);
     return decodedToken;
   } catch (error) {
+    console.error('Error getting the session:- ', error);
     return null;
   }
 }

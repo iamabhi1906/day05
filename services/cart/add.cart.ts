@@ -17,7 +17,7 @@ export const addProductToCart = async (buyerEmail: string, product: ProductData)
     buyerEmail,
     productId: product.id,
     productName: product.name,
-    productImageUrl: product.imageUrl,
+    productImageUrls: product.imageUrls,
     vendorEmail: product.vendorEmail,
     price: product.price,
     quantity: 1,

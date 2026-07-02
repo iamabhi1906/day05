@@ -1,6 +1,7 @@
 import UserRoleSelect from '@/components/role-selector';
 import { getSession } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/crud/user';
+import { Box } from '@mui/material';
 import { redirect } from 'next/navigation';
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
@@ -10,9 +11,5 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const user = await getUserByEmail(email!);
   if (!user) redirect('/login');
   if (user.role == null) return <UserRoleSelect user={user} />;
-  return (
-    <div style={{ height: '100%' }}>
-      {children}
-    </div>
-  );
+  return <Box sx={{ height: '100%', pt: 10 }}>{children}</Box>;
 }

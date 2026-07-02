@@ -46,7 +46,7 @@ export const getUserCartItemsAsync = createAsyncThunk<CartData[], CartUser, { re
             id: unProcessedCartProduct.productId,
             name: unProcessedCartProduct.productName,
             price: unProcessedCartProduct.price,
-            imageUrl: unProcessedCartProduct.productImageUrl,
+            imageUrls: unProcessedCartProduct.productImageUrls,
             vendorEmail: unProcessedCartProduct.vendorEmail,
           } as ProductData);
         }
@@ -76,6 +76,7 @@ export const getUserProductCartItemAsync = createAsyncThunk<CartData, GetProduct
         return cartItem;
       }
       const cartItem = await getProductCartItem(buyerEmail, productId);
+      console.log(cartItem);
       if (!cartItem) {
         return rejectWithValue('Cart item not found');
       }
@@ -102,7 +103,7 @@ export const addUserCartItemAsync = createAsyncThunk<CartData[], AddCartPayload,
             buyerEmail: null,
             productId: product.id,
             productName: product.name,
-            productImageUrl: product.imageUrl,
+            productImageUrls: product.imageUrls,
             vendorEmail: product.vendorEmail,
             price: product.price,
             quantity: 1,
@@ -113,6 +114,7 @@ export const addUserCartItemAsync = createAsyncThunk<CartData[], AddCartPayload,
         return cart;
       }
       await addProductToCart(buyerEmail, product);
+      console.log('item added to cart');
       return await getCartItems(buyerEmail);
     } catch {
       return rejectWithValue('Failed to add cart item.');

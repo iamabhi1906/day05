@@ -171,7 +171,13 @@ export default function CartPage() {
                     <TableRow key={item.id} className={styles.cartRow}>
                       <TableCell className={styles.productCell}>
                         <Box className={styles.productCellInner}>
-                          <Image src={item.productImageUrl || ''} width={1000} height={1000} alt={item.productName} className={styles.productImage} />
+                          <Image
+                            src={item.productImageUrls[0] || ''}
+                            width={1000}
+                            height={1000}
+                            alt={item.productName}
+                            className={styles.productImage}
+                          />
                           <Stack>
                             <Typography variant="h6">{item.productName}</Typography>
                             <Typography color="secondary">Product code: {item.productId}</Typography>

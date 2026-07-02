@@ -7,7 +7,7 @@ export interface UserData {
   email: string;
   role: string;
   uid: string;
-  name: string | null;
+  name: string;
   avatar: string | null;
   phone: string | null;
   createdAt: string;
@@ -39,7 +39,9 @@ export const createUser = async (user: UserInfo, role: string | null, name?: str
     };
     const docRef = await addDoc(collection(db, 'users'), newUser);
     return { id: docRef.id, ...newUser };
-  } catch (error) {}
+  } catch (error) {
+    console.error('Error creating the user:- ', error);
+  }
   const data = await addDoc(collection(db, 'users'), {
     email: user.email,
     role,

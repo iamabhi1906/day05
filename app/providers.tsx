@@ -2,6 +2,7 @@
 
 import { Provider, useDispatch } from 'react-redux';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { SnackbarProvider } from 'notistack';
 import store, { AppDispatch } from './store';
 import ThemeProviderComp from './theme';
 import { getUserByEmail } from '@/lib/crud/user';
@@ -33,6 +34,7 @@ export default function Providers({ children, session }: { children: React.React
     <Provider store={store}>
       <AppRouterCacheProvider>
         <ThemeProviderComp>
+          <SnackbarProvider autoHideDuration={5000} anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }} />
           <SessionUserSync session={session}>{children}</SessionUserSync>
         </ThemeProviderComp>
       </AppRouterCacheProvider>

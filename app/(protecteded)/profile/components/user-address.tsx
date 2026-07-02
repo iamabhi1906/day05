@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Alert, Box, Button, Chip, CircularProgress, FormControlLabel, Paper, Stack, Switch, TextField, Typography } from '@mui/material';
@@ -30,7 +30,9 @@ const emptyAddressValues: AddressFormType = {
 };
 
 const fetchAddressFromPinCode = async (pinCode: string): Promise<AddressAutofill | null> => {
-  const response = await fetch(`https://nominatim.openstreetmap.org/search?postalcode=${pinCode}&country=India&format=jsonv2&addressdetails=1&limit=1`);
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?postalcode=${pinCode}&country=India&format=jsonv2&addressdetails=1&limit=1`,
+  );
   if (!response.ok) {
     throw new Error('Unable to fetch address for that pin code.');
   }

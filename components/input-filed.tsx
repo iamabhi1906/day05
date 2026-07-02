@@ -12,6 +12,7 @@ import {
   FormLabel,
   Select,
   InputLabel,
+  FormHelperText,
 } from '@mui/material';
 
 type Option = {
@@ -53,7 +54,7 @@ export default function InputField<T extends FieldValues>({
               <FormControl fullWidth={fullWidth} error={!!fieldState.error} className={className}>
                 <InputLabel>{label}</InputLabel>
 
-                <Select {...field} label={label}>
+                <Select {...field} label={label} value={field.value ?? ''}>
                   {options.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -67,7 +68,7 @@ export default function InputField<T extends FieldValues>({
             return (
               <FormControlLabel
                 className={className}
-                control={<Checkbox checked={field.value} onChange={field.onChange} />}
+                control={<Checkbox checked={Boolean(field.value)} onChange={(event) => field.onChange(event.target.checked)} />}
                 label={label}
               />
             );
@@ -76,20 +77,21 @@ export default function InputField<T extends FieldValues>({
             return (
               <FormControlLabel
                 className={className}
-                control={<Switch checked={field.value} onChange={field.onChange} />}
+                control={<Switch checked={Boolean(field.value)} onChange={(event) => field.onChange(event.target.checked)} />}
                 label={label}
               />
             );
 
           case 'radio':
             return (
-              <FormControl className={className}>
+              <FormControl className={className} error={!!fieldState.error} disabled={disabled}>
                 <FormLabel>{label}</FormLabel>
-                <RadioGroup value={field.value} onChange={field.onChange}>
+                <RadioGroup value={field.value ?? ''} onChange={(event) => field.onChange(event.target.value)} row>
                   {options.map((option) => (
                     <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
                   ))}
                 </RadioGroup>
+                <FormHelperText>{fieldState.error?.message}</FormHelperText>
               </FormControl>
             );
 

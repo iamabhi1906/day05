@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { lato } from './ui/fonts';
 import styles from '@/app/_css/layout.module.css';
-import ThemeProviderComp from './theme';
 import { Box } from '@mui/material';
 import Providers from './providers';
 import NavigationBar from '@/components/navigation-bar';

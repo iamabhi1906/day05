@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Card, CardActions, CardContent, Chip, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
+import { Button, Card, CardActions, CardContent, IconButton, Stack, Typography, CircularProgress, Container } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -18,6 +18,8 @@ import {
   removeUserCartItemAsync,
   updateUserCartItemQuantityAsync,
 } from '@/features/cart/cart.actions';
+import { Star } from '@mui/icons-material';
+import NumberSpinner from '@/components/number-spinner';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -36,12 +38,9 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [cartItem, setCartItem] = useState<CartData | null>(null);
   const [currentDisplayImage, setCurrentDisplayImage] = useState<number>(0);
 
-  const imageUrls =
-    product.imageUrls?.filter((url): url is string => typeof url === 'string' && url.length > 0) ?? (product.imageUrl ? [product.imageUrl] : []);
-  const quantity = cartItem?.quantity ?? 0;
+  const imageUrls = product.imageUrls;
   const isInCart = Boolean(cartItem);
   const isOutOfStock = product.stock <= 0;
-  const previewText = product.description?.slice(0, 90) ?? 'Premium product curated for everyday comfort and style.';
 
   useEffect(() => {
     const fetchCartItem = async () => {
@@ -61,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       }
     };
     fetchCartItem();
-  }, [dispatch, product.id, userData?.email]);
+  }, [userData?.email, product.id, dispatch]);
 
   const handleAddToCart = async () => {
     try {
@@ -81,12 +80,11 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  const handleDecreaseQuantity = async () => {
+  const handleQuantityChange = async (quantity: number) => {
     if (!cartItem) return;
-    const nextQuantity = Math.max(0, quantity - 1);
     try {
       setLoading(true);
-      if (nextQuantity <= 0) {
+      if (quantity <= 0) {
         await dispatch(removeUserCartItemAsync({ buyerEmail: userData?.email ?? null, cartId: cartItem.id }));
         setCartItem(null);
         return;
@@ -95,7 +93,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         updateUserCartItemQuantityAsync({
           buyerEmail: userData?.email ?? null,
           cartId: cartItem.id,
-          quantity: nextQuantity,
+          quantity: quantity,
         }),
       );
       const result = await dispatch(
@@ -112,32 +110,23 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  const handleIncreaseQuantity = async () => {
-    if (!cartItem || isOutOfStock) return;
-    try {
-      await dispatch(addUserCartItemAsync({ buyerEmail: userData?.email ?? null, product }));
-      const result = await dispatch(
-        getUserProductCartItemAsync({
-          buyerEmail: userData?.email ?? null,
-          productId: product.id,
-        }),
-      ).unwrap();
-      setCartItem(result);
-    } catch (error) {
-      console.error('Failed to increase quantity:', error);
-    }
-  };
-
   return (
-    <Card className={styles.card} elevation={0}>
-      <Box className={styles.imageWrapper} onClick={() => router.push(`/products/${product.id}`)}>
-        <Image className={styles.mainMedia} src={imageUrls[currentDisplayImage] ?? imageUrls[0]} width={1000} height={1000} alt={product.name} loading="eager" />
-        <Chip label={isOutOfStock ? 'Out of stock' : 'In stock'} size="small" className={styles.stockBadge} color={isOutOfStock ? 'default' : 'success'} />
-      </Box>
+    <Card className={styles.card}>
+      <Container component={'div'} className={styles.productImageBackground}>
+        <Image
+          className={styles.mainMedia}
+          src={imageUrls[currentDisplayImage]}
+          width={1000}
+          height={1000}
+          alt={product.name}
+          loading="eager"
+          onClick={() => router.push(`/products/${product.id}`)}
+        />
+      </Container>
       <CardContent className={styles.cardContent}>
-        <Stack spacing={1.2}>
+        <Stack direction="column" spacing={1}>
           {imageUrls.length > 0 ? (
-            <Stack direction="row" spacing={1} className={styles.thumbnailRow}>
+            <Stack direction="row" spacing={1}>
               {imageUrls.slice(0, 4).map((image, index) => (
                 <Image
                   key={image}
@@ -155,47 +144,36 @@ export default function ProductCard({ product }: ProductCardProps) {
             </Stack>
           ) : null}
           <Stack spacing={1}>
-            <Typography variant="body2" color="text.secondary" className={styles.categoryLabel}>
-              {product.category}
-            </Typography>
-            <Typography variant="h6" className={styles.productName}>
+            <Typography variant="body1" sx={{ fontSize: 20 }}>
               {product.name}
             </Typography>
-            <Typography variant="body2" color="text.secondary" className={styles.description}>
-              {previewText}
-            </Typography>
-            <Typography variant="h6" className={styles.price}>
-              {currency.format(product.price)}
-            </Typography>
-            <Stack direction="row" spacing={1} className={styles.metaRow}>
-              <Chip size="small" label={`${product.stock} left`} variant="outlined" />
-              <Chip size="small" label={imageUrls.length > 1 ? `${imageUrls.length} photos` : '1 photo'} variant="outlined" />
+            <Stack direction={'row'} sx={{ justifyContent: 'space-between' }}>
+              <Typography variant="h6" sx={{ fontSize: 20, fontWeight: 700 }}>
+                {currency.format(product.price)}
+              </Typography>
+              <Stack direction={'row'}>
+                <Star color="warning" />
+                {/* <Typography>{(Math.random() * (5.0 - 2.0) + 2.0).toFixed(1)}/5.0</Typography> */}
+              </Stack>
             </Stack>
           </Stack>
         </Stack>
       </CardContent>
       <CardActions className={styles.cardActions}>
         {isInCart && cartItem ? (
-          <Stack spacing={1.5} className={styles.cartActionsRow} direction={{ xs: 'column', sm: 'row' }}>
+          <Stack className={styles.cartActionsRow} direction="column" spacing={1}>
             <Button variant="contained" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => router.push('/cart')} fullWidth disabled={loading}>
               Buy now
             </Button>
-            <Stack direction="row" spacing={1} className={styles.quantityControls}>
-              <IconButton color="primary" aria-label="decrease quantity" disabled={loading || quantity <= 1} onClick={handleDecreaseQuantity}>
-                {loading ? <CircularProgress size={24} /> : <RemoveIcon />}
-              </IconButton>
-              <Typography variant="body1" className={styles.quantityText}>
-                {quantity}
-              </Typography>
-              <IconButton
-                color="primary"
-                aria-label="increase quantity"
-                disabled={loading || isOutOfStock || quantity >= product.stock}
-                onClick={handleIncreaseQuantity}
-              >
-                {loading ? <CircularProgress size={24} /> : <AddIcon />}
-              </IconButton>
-            </Stack>
+            <NumberSpinner
+              size="small"
+              min={1}
+              max={product.stock}
+              value={cartItem.quantity}
+              onChange={(value) => {
+                if (value) handleQuantityChange(value);
+              }}
+            />
           </Stack>
         ) : (
           <Button variant="contained" startIcon={<AddShoppingCartIcon />} disabled={loading || isOutOfStock} onClick={handleAddToCart} fullWidth>

@@ -8,16 +8,6 @@ const initialState: ProductState = {
   error: null,
 };
 
-const handlePending = (state: ProductState) => {
-  state.loading = true;
-  state.error = null;
-};
-
-const handleRejected = (state: ProductState, action: { payload?: string }) => {
-  state.loading = false;
-  state.error = action.payload ?? 'Something went wrong';
-};
-
 const productSlice = createSlice({
   name: 'user',
   initialState,

@@ -5,7 +5,7 @@ export const UserSchema = z.object({
   email: z.string(),
   role: z.string(),
   uid: z.string(),
-  name: z.string().nullable(),
+  name: z.string(),
   avatar: z.string().nullable(),
   phone: z.string().nullable(),
   createdAt: z.preprocess((value) => (value instanceof Date ? value.toISOString() : value), z.string().nullable().optional()),

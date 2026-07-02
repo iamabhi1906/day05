@@ -14,14 +14,22 @@ type ProductSideBarProps = {
 
 export default function ProductSideBar({ filters, onChangeFilters }: ProductSideBarProps) {
   return (
-    <aside className={styles.sidebar}>
+    <Box
+      component="aside"
+      className={styles.sidebar}
+      sx={{
+        position: 'sticky',
+        top: '24px',
+        height: 'calc(100vh - 48px)',
+        overflowY: 'auto',
+        width: '220px',
+        flexShrink: 0,
+      }}
+    >
       <Typography variant="h6" gutterBottom className={styles.title}>
         Product Filter
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Narrow down by search term or category to find your next favorite item.
-      </Typography>
-      <Stack spacing={1.5}>
+      <Stack spacing={1}>
         <SearchBar
           label="Search Your Product"
           query={filters?.search || ''}
@@ -34,25 +42,27 @@ export default function ProductSideBar({ filters, onChangeFilters }: ProductSide
           <Stack direction={'column'} spacing={1}>
             {categories.map((category, index) => {
               const isSelected = filters?.category === category.value;
+              const CategoryIcon = category.icon;
+
               return (
-                <Box key={`categories.values+${index}`}>
+                <div key={`categories.values+${index}`}>
                   <Button
-                    key={category.label}
                     color={isSelected ? 'primary' : 'inherit'}
                     className={styles.categoryButton}
-                    variant={isSelected ? 'contained' : 'text'}
+                    startIcon={<CategoryIcon fontSize="small" />}
+                    endIcon={isSelected ? <Check color="primary" /> : undefined}
                     onClick={() => onChangeFilters({ category: category.value })}
+                    sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
                   >
-                    {filters?.category === category.value && <Check color="primary" />}
                     {category.label}
                   </Button>
-                  {index < categories.length - 1 ? <Divider sx={{ my: 0.5 }} /> : null}
-                </Box>
+                  <Divider />
+                </div>
               );
             })}
           </Stack>
         </Box>
       </Stack>
-    </aside>
+    </Box>
   );
 }
