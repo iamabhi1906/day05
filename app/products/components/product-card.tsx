@@ -1,9 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardActions, CardContent, IconButton, Stack, Typography, CircularProgress, Container } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Button, Card, CardActions, CardContent, Stack, Typography, CircularProgress, Box } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import { useEffect, useState } from 'react';
 import styles from './product-card.module.css';
@@ -112,7 +110,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className={styles.card}>
-      <Container component={'div'} className={styles.productImageBackground}>
+      <Box component={'div'} className={styles.productImageBackground}>
         <Image
           className={styles.mainMedia}
           src={imageUrls[currentDisplayImage]}
@@ -122,11 +120,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           loading="eager"
           onClick={() => router.push(`/products/${product.id}`)}
         />
-      </Container>
+      </Box>
       <CardContent className={styles.cardContent}>
         <Stack direction="column" spacing={1}>
           {imageUrls.length > 0 ? (
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ overflowX: 'auto' }}>
               {imageUrls.slice(0, 4).map((image, index) => (
                 <Image
                   key={image}

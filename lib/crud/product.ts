@@ -77,6 +77,11 @@ export const getVendorProducts = async (vendorEmail: string): Promise<ProductDat
   return snapshot.docs.map(productFromDoc);
 };
 
+export const getAllProducts = async (): Promise<ProductData[]> => {
+  const snapshot = await getDocs(query(productsCollection, orderBy('createdAt', 'desc')));
+  return snapshot.docs.map(productFromDoc);
+};
+
 export const getPublishedProducts = async ({
   limit: pageSize = 12,
   search,

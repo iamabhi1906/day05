@@ -2,16 +2,61 @@
   align-items: flex-start;
 }
 
-.sidebarColumn {
-  width: 220px;
-  flex-shrink: 0;
-}
-
 .contentColumn {
   flex: 1;
   min-width: 0;
+}
+
+.mobileSidebarButtonContainer {
+  display: none;
+} 
+
+.mobileSidebarButton {
+  display: inline-flex;
+  width: calc(100% - 32px);
+  max-width: 420px;
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 1500;
+  justify-content: center;
+}
+
+.mobileSidebarOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.mobileSidebarOverlay.open {
+  display: block;
+}
+
+.mobileSidebarContent {
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.16);
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  max-height: calc(100vh - 40px);
   overflow-y: auto;
-  height: '100%';
+  padding: 1rem;
+}
+
+@media (max-width: 900px) {
+  .sidebarColumn {
+    display: none;
+  }
+
+  .mobileSidebarButtonContainer {
+    display: block;
+  }
 }
 
 .resultsText {

@@ -4,7 +4,6 @@ import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 import { GetPublishedProductsParams } from '@/features/product/product.types';
 import styles from './product-side-bar.module.css';
 import { categories } from './product-categories';
-import SearchBar from '@/components/search-bar';
 import { Check } from '@mui/icons-material';
 
 type ProductSideBarProps = {
@@ -14,29 +13,18 @@ type ProductSideBarProps = {
 
 export default function ProductSideBar({ filters, onChangeFilters }: ProductSideBarProps) {
   return (
-    <Box
-      component="aside"
-      className={styles.sidebar}
-      sx={{
-        position: 'sticky',
-        top: '24px',
-        height: 'calc(100vh - 48px)',
-        overflowY: 'auto',
-        width: '220px',
-        flexShrink: 0,
-      }}
-    >
+    <Box component="aside" className={styles.sidebar}>
       <Typography variant="h6" gutterBottom className={styles.title}>
         Product Filter
       </Typography>
       <Stack spacing={1}>
-        <SearchBar
+        {/* <SearchBar
           label="Search Your Product"
           query={filters?.search || ''}
           setQuery={(query) => {
             onChangeFilters({ search: query });
           }}
-        />
+        /> */}
 
         <Box>
           <Stack direction={'column'} spacing={1}>

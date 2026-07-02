@@ -1,6 +1,6 @@
 import { UserInfo } from 'firebase/auth';
 import { db } from '../firebase';
-import { addDoc, collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
 
 export interface UserData {
   id: string;
@@ -116,4 +116,37 @@ export const updateUserByEmail = async (
     console.error('Error updating user by email:', error);
     return null;
   }
+};
+
+export const getAllUsers = async (): Promise<UserData[]> => {
+  try {
+    const usersRef = collection(db, 'users');
+    const snapshot = await getDocs(usersRef);
+    return snapshot.docs.map((userDoc) => {
+      const data = userDoc.data();
+      return {
+        id: userDoc.id,
+        email: data.email,
+        role: data.role,
+        uid: data.uid,
+        name: data.name,
+        avatar: data.avatar,
+        phone: data.phone,
+        createdAt: toDateValue(data.createdAt),
+        isBlocked: data.isBlocked,
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching all users:', error);
+    return [];
+  }
+};
+
+export const deleteUserByEmail = async (email: string): Promise<void> => {
+  const usersRef = collection(db, 'users');
+  const q = query(usersRef, where('email', '==', email));
+  const result = await getDocs(q);
+  if (result.empty) return;
+  const userDoc = result.docs[0];
+  await deleteDoc(doc(db, 'users', userDoc.id));
 };

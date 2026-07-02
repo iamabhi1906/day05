@@ -17,10 +17,19 @@ const buyerPages = [
   { label: 'Orders', href: '/orders', icon: <ReceiptLong fontSize="small" /> },
 ];
 
+import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
+
 const vendorPages = [
   { label: 'Products', href: '/products', icon: <LocalMall fontSize="small" /> },
   { label: 'Manage', href: '/vendor/products', icon: <Inventory fontSize="small" /> },
   { label: 'Orders', href: '/vendor/orders', icon: <ReceiptLong fontSize="small" /> },
+  { label: 'Profile', href: '/profile', icon: <AccountCircle fontSize="small" /> },
+];
+
+const adminPages = [
+  { label: 'Dashboard', href: '/products', icon: <LocalMall fontSize="small" /> },
+  { label: 'Admin', href: '/admin', icon: <AdminPanelSettings fontSize="small" /> },
+  { label: 'Orders', href: '/orders', icon: <ReceiptLong fontSize="small" /> },
   { label: 'Profile', href: '/profile', icon: <AccountCircle fontSize="small" /> },
 ];
 
@@ -34,7 +43,7 @@ export default function NavigationMenu() {
   const { cartItem, loading: cartLoading } = useSelector((state: RootState) => state.cart);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const pages = user?.role === 'vendor' ? vendorPages : buyerPages;
+  const pages = user?.role === 'admin' ? adminPages : user?.role === 'vendor' ? vendorPages : buyerPages;
   const cartCount = useMemo(() => cartItem.reduce((total, item) => total + item.quantity, 0), [cartItem]);
 
   useEffect(() => {
