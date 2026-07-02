@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Divider, Stack, Typography } from '@mui/material';
-import { GetPublishedProductsParams, ProductCategory } from '@/features/product/product.types';
+import { GetPublishedProductsParams } from '@/features/product/product.types';
 import styles from './product-side-bar.module.css';
 import { categories } from './product-categories';
 import SearchBar from '@/components/search-bar';
@@ -18,7 +18,10 @@ export default function ProductSideBar({ filters, onChangeFilters }: ProductSide
       <Typography variant="h6" gutterBottom className={styles.title}>
         Product Filter
       </Typography>
-      <Stack spacing={1}>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Narrow down by search term or category to find your next favorite item.
+      </Typography>
+      <Stack spacing={1.5}>
         <SearchBar
           label="Search Your Product"
           query={filters?.search || ''}
@@ -32,18 +35,19 @@ export default function ProductSideBar({ filters, onChangeFilters }: ProductSide
             {categories.map((category, index) => {
               const isSelected = filters?.category === category.value;
               return (
-                <div key={`categories.values+${index}`}>
+                <Box key={`categories.values+${index}`}>
                   <Button
                     key={category.label}
                     color={isSelected ? 'primary' : 'inherit'}
                     className={styles.categoryButton}
+                    variant={isSelected ? 'contained' : 'text'}
                     onClick={() => onChangeFilters({ category: category.value })}
                   >
                     {filters?.category === category.value && <Check color="primary" />}
                     {category.label}
                   </Button>
-                  <Divider />
-                </div>
+                  {index < categories.length - 1 ? <Divider sx={{ my: 0.5 }} /> : null}
+                </Box>
               );
             })}
           </Stack>

@@ -1,11 +1,11 @@
 'use client';
 import { getPublishedProducts } from '@/lib/crud/product';
-import { Alert, Grid, Snackbar, Box, CircularProgress, Typography, Stack } from '@mui/material';
+import { Alert, Box, CircularProgress, Grid, Paper, Skeleton, Snackbar, Stack, Typography } from '@mui/material';
 import ProductCard from './product-card';
 import ProductSideBar from './product-side-bar';
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { GetPublishedProductsParams, ProductCategory, ProductData } from '@/features/product/product.types';
+import { GetPublishedProductsParams, ProductData } from '@/features/product/product.types';
 import styles from './product-display.module.css';
 
 interface props {
@@ -17,6 +17,7 @@ export default function ProductDisplay({ products, lastDoc }: props) {
   const [visibleProducts, setProducts] = useState<ProductData[]>(products);
   const [hasMore, setHasMore] = useState<boolean>(lastDoc !== null);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [filters, setFilters] = useState<GetPublishedProductsParams>({ limit: 12, category: null, search: '', lastDocId: lastDoc });
 
   const [notification, setNotification] = useState({
@@ -25,12 +26,14 @@ export default function ProductDisplay({ products, lastDoc }: props) {
     severity: 'success' as 'success' | 'error',
   });
 
-  const handleFiltersChange = async (newFilters: GetPublishedProductsParams) => {
-    await loadProducts(newFilters);
-  };
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsInitialLoading(false), 350);
+    return () => window.clearTimeout(timer);
+  }, []);
 
-  const loadProducts = useCallback(async (params: GetPublishedProductsParams) => {
+  const loadProducts = async (params: GetPublishedProductsParams) => {
     try {
+      setIsInitialLoading(true);
       const { data, lastDocId } = await getPublishedProducts({
         ...params,
         lastDocId: null,
@@ -40,10 +43,16 @@ export default function ProductDisplay({ products, lastDoc }: props) {
       setFilters((prev) => ({ ...prev, ...params, lastDocId }));
     } catch (error) {
       console.error(error);
+    } finally {
+      window.setTimeout(() => setIsInitialLoading(false), 250);
     }
-  }, []);
+  };
 
-  const fetchMoreProducts = useCallback(async () => {
+  const handleFiltersChange = async (newFilters: GetPublishedProductsParams) => {
+    await loadProducts(newFilters);
+  };
+
+  const fetchMoreProducts = async () => {
     if (isLoadingMore || !filters) return;
     setIsLoadingMore(true);
     try {
@@ -65,7 +74,7 @@ export default function ProductDisplay({ products, lastDoc }: props) {
     } finally {
       setIsLoadingMore(false);
     }
-  }, [isLoadingMore, filters]);
+  };
 
   return (
     <>
@@ -75,7 +84,34 @@ export default function ProductDisplay({ products, lastDoc }: props) {
         </Box>
 
         <Box className={styles.contentColumn}>
-          {visibleProducts.length === 0 ? (
+          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1} sx={{ mb: 3 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                Featured picks
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Fresh arrivals and curated essentials for your next order.
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              {visibleProducts.length} products available
+            </Typography>
+          </Stack>
+
+          {isInitialLoading ? (
+            <Grid container spacing={3}>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <Grid key={`product-skeleton-${index}`} item xs={12} sm={6} md={3}>
+                  <Paper variant="outlined" sx={{ borderRadius: 3, p: 2, minHeight: 380 }}>
+                    <Skeleton variant="rectangular" height={240} sx={{ borderRadius: 2, mb: 2 }} />
+                    <Skeleton variant="text" width="70%" height={28} />
+                    <Skeleton variant="text" width="40%" height={24} />
+                    <Skeleton variant="rounded" height={42} sx={{ mt: 2 }} />
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          ) : visibleProducts.length === 0 ? (
             <Typography className={styles.emptyState}>No products found for this category.</Typography>
           ) : (
             <InfiniteScroll
@@ -90,13 +126,11 @@ export default function ProductDisplay({ products, lastDoc }: props) {
               endMessage={<Typography className={styles.endMessage}>No more products to load</Typography>}
             >
               <Grid container spacing={3}>
-                {visibleProducts.map((product) => {
-                  return (
-                    <Grid key={product.id} size={{ xs: 12, sm: 6, md: 3 }}>
-                      <ProductCard product={product} />
-                    </Grid>
-                  );
-                })}
+                {visibleProducts.map((product) => (
+                  <Grid key={product.id} item xs={12} sm={6} md={3}>
+                    <ProductCard product={product} />
+                  </Grid>
+                ))}
               </Grid>
             </InfiniteScroll>
           )}

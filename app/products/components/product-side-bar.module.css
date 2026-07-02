@@ -1,21 +1,27 @@
 .sidebar {
   padding: 1rem;
-  border-radius: 1rem;
-  height: 90dvh;
+  border-radius: 1.25rem;
+  min-height: 100%;
+  position: sticky;
+  top: 100px;
+  background: linear-gradient(135deg, rgba(25, 118, 210, 0.08), rgba(255, 255, 255, 0.96));
+  border: 1px solid rgba(25, 118, 210, 0.12);
 }
 
 .title {
   font-weight: 700;
 }
 
-.sectionTitle {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 0.5rem;
+.categoryButton {
+  border-radius: 999px;
+  margin-bottom: 0.25rem;
+  justify-content: flex-start;
+  width: 100%;
+  padding-inline: 0.85rem;
 }
 
-.categoryButton {
-  border-radius: 0.75rem;
-  margin-bottom: 0.25rem;
-  gap: 2;
+@media (max-width: 900px) {
+  .sidebar {
+    height: auto;
+  }
 }

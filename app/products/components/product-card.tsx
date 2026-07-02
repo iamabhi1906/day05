@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardActions, CardContent, IconButton, Stack, Typography, CircularProgress } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, Chip, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -41,6 +41,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const quantity = cartItem?.quantity ?? 0;
   const isInCart = Boolean(cartItem);
   const isOutOfStock = product.stock <= 0;
+  const previewText = product.description?.slice(0, 90) ?? 'Premium product curated for everyday comfort and style.';
 
   useEffect(() => {
     const fetchCartItem = async () => {
@@ -60,7 +61,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       }
     };
     fetchCartItem();
-  }, [userData?.email, product.id, dispatch]);
+  }, [dispatch, product.id, userData?.email]);
 
   const handleAddToCart = async () => {
     try {
@@ -128,20 +129,15 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Card className={styles.card}>
-      <Image
-        className={styles.mainMedia}
-        src={imageUrls[currentDisplayImage]}
-        width={1000}
-        height={1000}
-        alt={product.name}
-        loading="eager"
-        onClick={() => router.push(`/products/${product.id}`)}
-      />
+    <Card className={styles.card} elevation={0}>
+      <Box className={styles.imageWrapper} onClick={() => router.push(`/products/${product.id}`)}>
+        <Image className={styles.mainMedia} src={imageUrls[currentDisplayImage] ?? imageUrls[0]} width={1000} height={1000} alt={product.name} loading="eager" />
+        <Chip label={isOutOfStock ? 'Out of stock' : 'In stock'} size="small" className={styles.stockBadge} color={isOutOfStock ? 'default' : 'success'} />
+      </Box>
       <CardContent className={styles.cardContent}>
-        <Stack direction="column" spacing={1}>
+        <Stack spacing={1.2}>
           {imageUrls.length > 0 ? (
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} className={styles.thumbnailRow}>
               {imageUrls.slice(0, 4).map((image, index) => (
                 <Image
                   key={image}
@@ -159,18 +155,28 @@ export default function ProductCard({ product }: ProductCardProps) {
             </Stack>
           ) : null}
           <Stack spacing={1}>
+            <Typography variant="body2" color="text.secondary" className={styles.categoryLabel}>
+              {product.category}
+            </Typography>
             <Typography variant="h6" className={styles.productName}>
               {product.name}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" className={styles.description}>
+              {previewText}
             </Typography>
             <Typography variant="h6" className={styles.price}>
               {currency.format(product.price)}
             </Typography>
+            <Stack direction="row" spacing={1} className={styles.metaRow}>
+              <Chip size="small" label={`${product.stock} left`} variant="outlined" />
+              <Chip size="small" label={imageUrls.length > 1 ? `${imageUrls.length} photos` : '1 photo'} variant="outlined" />
+            </Stack>
           </Stack>
         </Stack>
       </CardContent>
       <CardActions className={styles.cardActions}>
         {isInCart && cartItem ? (
-          <Stack spacing={1.5} className={styles.cartActionsRow} direction="row">
+          <Stack spacing={1.5} className={styles.cartActionsRow} direction={{ xs: 'column', sm: 'row' }}>
             <Button variant="contained" startIcon={<ShoppingCartCheckoutIcon />} onClick={() => router.push('/cart')} fullWidth disabled={loading}>
               Buy now
             </Button>
