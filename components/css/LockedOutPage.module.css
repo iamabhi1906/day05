@@ -1,0 +1,19 @@
+.root {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.card {
+  border-radius: 20px;
+  text-align: center;
+  padding: 24px 12px;
+}
+
+
+.icon {
+  font-size: 52px !important;
+  color: var(--mui-palette-error-main);
+}

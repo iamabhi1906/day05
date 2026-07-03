@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { lato } from './ui/fonts';
+import { inter, lato } from './ui/fonts';
 import styles from '@/app/_css/layout.module.css';
 import { Box } from '@mui/material';
 import Providers from './providers';
@@ -19,7 +19,7 @@ export default async function RootLayout({
 }>) {
   const session = await getSession();
   return (
-    <html lang="en" className={`${lato.className} ${styles.mainBody}`}>
+    <html lang="en" className={`${lato.className} ${inter.className} ${styles.mainBody}`}>
       <body>
         <Providers session={session}>
           <NavigationBar />

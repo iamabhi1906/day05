@@ -1,0 +1,26 @@
+.summary {
+  width: 320px;
+  min-width: 280px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.summaryTitle {
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-align: center;
+  border-bottom: 1px solid var(--mui-palette-text-secondary);
+  padding-bottom: 8px;
+}
+
+.summaryLine {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.94rem;
+}

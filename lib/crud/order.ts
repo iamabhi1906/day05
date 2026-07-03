@@ -1,7 +1,10 @@
+'use server';
+
 import { addDoc, collection, DocumentData, getDocs, orderBy, query, QueryDocumentSnapshot, serverTimestamp, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { clearCart } from './cart';
 import { CartData } from '@/features/cart/cart.types';
+import { Protect } from '../auth';
 
 export interface OrderItemData {
   productId: string;
@@ -29,7 +32,6 @@ const toDate = (value: { toDate?: () => Date } | null | undefined) => {
 
 const orderFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): OrderData => {
   const data = snapshot.data();
-
   return {
     id: snapshot.id,
     buyerEmail: data.buyerEmail,
@@ -44,11 +46,12 @@ export const placeOrder = async (buyerEmail: string, cartItems: CartData[]) => {
   if (cartItems.length === 0) {
     throw new Error('Cart is empty');
   }
+  await Protect();
 
   const items: OrderItemData[] = cartItems.map((item) => ({
     productId: item.productId,
     productName: item.productName,
-    productImageUrl: item.productImageUrl ?? '',
+    productImageUrl: item.productImageUrls[0] ?? '',
     vendorEmail: item.vendorEmail,
     price: item.price,
     quantity: item.quantity,
@@ -68,16 +71,16 @@ export const placeOrder = async (buyerEmail: string, cartItems: CartData[]) => {
 };
 
 export const getBuyerOrders = async (buyerEmail: string): Promise<OrderData[]> => {
+  await Protect();
   const q = query(ordersCollection, where('buyerEmail', '==', buyerEmail), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map(orderFromDoc);
 };
 
 export const getVendorOrders = async (vendorEmail: string): Promise<OrderData[]> => {
+  await Protect();
   const snapshot = await getDocs(ordersCollection);
-
   const filteredOrders = snapshot.docs.map(orderFromDoc).filter((order) => order.items.some((item) => item.vendorEmail === vendorEmail));
-
   return filteredOrders
     .map((order) => {
       const vendorItems = order.items.filter((item) => item.vendorEmail === vendorEmail);

@@ -1,3 +1,4 @@
+import LockedOutPage from '@/components/locked';
 import UserRoleSelect from '@/components/role-selector';
 import { getSession } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/crud/user';
@@ -11,5 +12,6 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const user = await getUserByEmail(email!);
   if (!user) redirect('/login');
   if (user.role == null) return <UserRoleSelect user={user} />;
+  if (user.isBlocked) return <LockedOutPage />;
   return <Box sx={{ height: '100%', pt: 10 }}>{children}</Box>;
 }

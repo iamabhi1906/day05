@@ -1,19 +1,21 @@
 'use client';
 import { getPublishedProducts } from '@/lib/crud/product';
 import { Button, Grid, Box, Typography, Stack, Skeleton } from '@mui/material';
-import ProductCard from './product-card';
 import ProductSideBar from './product-side-bar';
 import { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { GetPublishedProductsParams, ProductData } from '@/features/product/product.types';
 import styles from './product-display.module.css';
+import ProductCard from './product-card';
+import { UserData } from '@/features/user/user.types';
 
 interface props {
+  user: UserData | null;
   products: ProductData[];
   lastDoc: string | null;
 }
 
-export default function ProductDisplay({ products, lastDoc }: props) {
+export default function ProductDisplay({ user, products, lastDoc }: props) {
   const [visibleProducts, setProducts] = useState<ProductData[]>(products);
   const [hasMore, setHasMore] = useState<boolean>(lastDoc !== null);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);

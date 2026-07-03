@@ -3,6 +3,13 @@
   flex-grow: 1;
   font-weight: 700;
   letter-spacing: 0.2rem;
+  color: #fff;
+}
+
+.navLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .navRoot {
@@ -59,7 +66,7 @@
 
 .profileChipLabel {
   font-weight: 700;
-  color: #fff
+  color: #fff;
 }
 
 .profileMenuLink {

@@ -40,11 +40,11 @@ export default function NavigationMenu() {
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const { userData: user, isAuthenticated } = useSelector((state: RootState) => state.user);
-  const { cartItem, loading: cartLoading } = useSelector((state: RootState) => state.cart);
+  const { cartItems, loading: cartLoading } = useSelector((state: RootState) => state.cart);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const pages = user?.role === 'admin' ? adminPages : user?.role === 'vendor' ? vendorPages : buyerPages;
-  const cartCount = useMemo(() => cartItem.reduce((total, item) => total + item.quantity, 0), [cartItem]);
+  const cartCount = useMemo(() => cartItems.reduce((total, item) => total + item.quantity, 0), [cartItems]);
 
   useEffect(() => {
     void dispatch(getUserCartItemsAsync({ buyerEmail: user?.email ?? null }));
@@ -54,6 +54,8 @@ export default function NavigationMenu() {
     setIsLoggingOut(true);
     try {
       await fetch('/api/logout', { method: 'POST' });
+      dispatch(clearUserData());
+      window.location.reload();
     } finally {
       dispatch(clearUserData());
       dispatch(resetCartState());

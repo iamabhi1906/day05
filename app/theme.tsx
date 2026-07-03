@@ -1,52 +1,59 @@
 'use client';
+
 import { CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 export const theme = createTheme({
   cssVariables: true,
+
+  typography: {
+    fontFamily: 'var(--font-inter)',
+  },
+
   palette: {
     mode: 'light',
+
     primary: {
-      main: '#1D3557',
-      light: '#457B9D',
-      dark: '#14263F',
+      light: '#8EC5FF',
+      main: '#5B8DEF',
+      dark: '#3B6EDC',
       contrastText: '#FFFFFF',
     },
 
     secondary: {
-      main: '#457B9D',
-      light: '#6E9DBA',
-      dark: '#2E5973',
+      light: '#CBB7FF',
+      main: '#9D7CFF',
+      dark: '#7C5CFA',
       contrastText: '#FFFFFF',
     },
 
-    error: {
-      main: '#E63946',
+    success: {
+      main: '#55C79A',
     },
 
     warning: {
-      main: '#F4A261',
+      main: '#FFB84D',
     },
 
-    success: {
-      main: '#2A9D8F',
+    error: {
+      main: '#FF6B81',
     },
 
     info: {
-      main: '#A8DADC',
+      main: '#6FD3FF',
     },
 
     background: {
-      default: '#F1FAEE',
+      default: '#F8F9FE',
       paper: '#FFFFFF',
     },
 
     text: {
-      primary: '#1D3557',
-      secondary: '#457B9D',
+      primary: '#25324B',
+      secondary: '#6E7A94',
     },
 
-    divider: '#D8E2DC',
+    divider: '#E5EAF5',
   },
 
   shape: {

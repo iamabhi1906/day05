@@ -5,7 +5,7 @@ import { getUserCartItemsAsync, addUserCartItemAsync, removeUserCartItemAsync, c
 const calculateTotal = (items: CartData[]) => items.reduce((total, item) => total + item.price * item.quantity, 0);
 
 const initialState: CartState = {
-  cartItem: [],
+  cartItems: [],
   loading: false,
   error: null,
   total: 0,
@@ -14,7 +14,7 @@ const initialState: CartState = {
 const updateCart = (state: CartState, action: PayloadAction<CartData[]>) => {
   state.loading = false;
   state.error = null;
-  state.cartItem = action.payload;
+  state.cartItems = action.payload;
   state.total = calculateTotal(action.payload);
 };
 

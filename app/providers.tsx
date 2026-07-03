@@ -8,6 +8,7 @@ import ThemeProviderComp from './theme';
 import { getUserByEmail } from '@/lib/crud/user';
 import { setUserData } from '@/features/user/user.slice';
 import { useEffect } from 'react';
+import { getUserCartItemsAsync } from '@/features/cart/cart.actions';
 
 function SessionUserSync({ session, children }: { children: React.ReactNode; session: { email?: string } | null }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -15,12 +16,15 @@ function SessionUserSync({ session, children }: { children: React.ReactNode; ses
   useEffect(() => {
     const initUser = async () => {
       const email = session?.email;
-      if (!email) return;
-
-      const user = await getUserByEmail(email);
-      if (!user) return;
-
-      dispatch(setUserData(user));
+      if (email) {
+        const user = await getUserByEmail(email);
+        if (user) {
+          dispatch(setUserData(user));
+        }
+        dispatch(getUserCartItemsAsync({ buyerEmail: email }));
+      } else {
+        dispatch(getUserCartItemsAsync({ buyerEmail: null }));
+      }
     };
 
     initUser();
@@ -30,6 +34,31 @@ function SessionUserSync({ session, children }: { children: React.ReactNode; ses
 }
 
 export default function Providers({ children, session }: { children: React.ReactNode; session: { email?: string } | null }) {
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.performance) return;
+    try {
+      const perf: any = window.performance;
+      const orig = perf.measure.bind(perf);
+      perf.measure = function (name: any, startOrOptions?: any, end?: any) {
+        try {
+          if (startOrOptions && typeof startOrOptions === 'object') {
+            const options = { ...startOrOptions };
+            if (typeof options.start === 'number' && options.start < 0) options.start = 0;
+            if (typeof options.end === 'number' && options.end < 0) options.end = 0;
+            return orig(name, options);
+          }
+          return orig(name, startOrOptions, end);
+        } catch (e) {
+          return orig(name, startOrOptions, end);
+        }
+      };
+      return () => {
+        perf.measure = orig;
+      };
+    } catch (e) {
+      // ignore
+    }
+  }, []);
   return (
     <Provider store={store}>
       <AppRouterCacheProvider>

@@ -1,0 +1,12 @@
+
+.cartProductCard{
+    display: flex;
+    padding: 10px;
+    gap: 25;
+}
+
+.productImage{
+    background-color: var(--mui-palette-primary-contrastText);
+    border: 1px solid var(--mui-palette-text-primary);
+    border-radius: var(--mui-shape-borderRadius);
+}

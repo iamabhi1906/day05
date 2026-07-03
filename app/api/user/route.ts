@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { getUserByEmail, updateUserProfile } from '@/lib/crud/user';
+import { getUserByEmail } from '@/lib/crud/user';
 
 export async function GET(req: NextRequest) {
   try {

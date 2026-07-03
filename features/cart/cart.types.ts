@@ -14,7 +14,7 @@ export const CartSchema = z.object({
 
 export type CartData = z.infer<typeof CartSchema>;
 export interface CartState {
-  cartItem: CartData[];
+  cartItems: CartData[];
   loading: boolean;
   error: string | null;
   total: number;

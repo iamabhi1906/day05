@@ -69,7 +69,7 @@ export default function SignupPage() {
       setLoading(true);
       await EmailSignup(data.name, data.email, data.password, data.role);
       showNotification('Signup success!', NotificationSeverity.SUCCESS);
-      router.push('/dashboard');
+      router.replace('/dashboard');
     } catch (error: unknown) {
       showNotification(getErrorMessage(error, 'Failed to signUp..!!'), NotificationSeverity.ERROR);
     } finally {
@@ -82,7 +82,7 @@ export default function SignupPage() {
       setLoading(true);
       await GoogleLogin();
       showNotification('SignUp success..!!', NotificationSeverity.SUCCESS);
-      router.push('/dashboard');
+      router.replace('/dashboard');
     } catch (error: unknown) {
       console.error(error);
       showNotification(getErrorMessage(error, 'Login failed'), NotificationSeverity.ERROR);
@@ -112,7 +112,7 @@ export default function SignupPage() {
                 </Typography>
                 <InputField
                   name="role"
-                  label=''
+                  label=""
                   control={control as any}
                   type="radio"
                   options={[

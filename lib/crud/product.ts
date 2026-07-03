@@ -1,3 +1,4 @@
+'use server';
 import {
   addDoc,
   collection,
@@ -18,6 +19,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { GetPublishedProductsParams, ProductData, ProductEdit, ProductInput } from '@/features/product/product.types';
+import { Protect } from '../auth';
 
 export type ProductStatus = 'draft' | 'published';
 
@@ -52,6 +54,7 @@ const productFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): ProductD
 };
 
 export const createProduct = async (product: ProductInput) => {
+  await Protect();
   const docRef = await addDoc(productsCollection, {
     ...product,
     createdAt: serverTimestamp(),
@@ -61,6 +64,7 @@ export const createProduct = async (product: ProductInput) => {
 };
 
 export const updateProduct = async (productId: string, product: ProductEdit) => {
+  await Protect();
   await updateDoc(doc(db, 'products', productId), {
     ...product,
     updatedAt: serverTimestamp(),
@@ -68,6 +72,7 @@ export const updateProduct = async (productId: string, product: ProductEdit) => 
 };
 
 export const deleteProduct = async (productId: string) => {
+  await Protect();
   await deleteDoc(doc(db, 'products', productId));
 };
 
@@ -83,7 +88,7 @@ export const getAllProducts = async (): Promise<ProductData[]> => {
 };
 
 export const getPublishedProducts = async ({
-  limit: pageSize = 12,
+  limit: pageSize = 60,
   search,
   lastDocId,
   category,

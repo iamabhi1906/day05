@@ -15,7 +15,7 @@ import InputField from '@/components/input-filed';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/app/store';
 import { setUserData } from '@/features/user/user.slice';
-import { UserData, UserSchema } from '@/features/user/user.types';
+import { UserSchema } from '@/features/user/user.types';
 
 enum NotificationSeverity {
   SUCCESS = 'success',
@@ -70,7 +70,7 @@ export default function LoginPage() {
       const user = await GoogleLogin();
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
       dispatch(setUserData(UserSchema.parse(user)));
-      router.push('/dashboard');
+      router.replace('/dashboard');
     } catch (error: unknown) {
       console.error(error);
       showNotification(getErrorMessage(error, 'Login failed'), NotificationSeverity.ERROR);
@@ -86,7 +86,7 @@ export default function LoginPage() {
       if (!user) return;
       dispatch(setUserData(user));
       showNotification('Login success..!!', NotificationSeverity.SUCCESS);
-      router.push('/dashboard');
+      router.replace('/dashboard');
     } catch (error: unknown) {
       console.log(error);
       showNotification(getErrorMessage(error, 'Login Failed'), NotificationSeverity.ERROR);

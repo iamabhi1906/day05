@@ -40,11 +40,11 @@ const currency = new Intl.NumberFormat('en-US', {
 });
 
 export default function CartPage() {
-  const { cartItem } = useSelector((state: RootState) => state.cart);
+  const { cartItems } = useSelector((state: RootState) => state.cart);
   const { userData: user } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const [items, setItems] = useState<CartData[]>(cartItem);
+  const [items, setItems] = useState<CartData[]>(cartItems);
   const [loading, setLoading] = useState(false);
   const [loadingItemId, setLoadingItemId] = useState<string | null>(null);
   const [notification, setNotification] = useState({
@@ -68,8 +68,8 @@ export default function CartPage() {
   }, [dispatch, user?.email]);
 
   useEffect(() => {
-    setItems(cartItem);
-  }, [cartItem]);
+    setItems(cartItems);
+  }, [cartItems]);
 
   const handleIncreaseQuantity = async (item: CartData) => {
     try {
@@ -127,26 +127,7 @@ export default function CartPage() {
     }
   };
 
-  const checkout = async () => {
-    try {
-      setLoading(true);
-      if (!user) {
-        router.replace('/login');
-        return;
-      }
-      await placeOrder(user.email, items);
-      setItems([]);
-      setNotification({ open: true, message: 'Order placed.', severity: 'success' });
-    } catch (error: unknown) {
-      setNotification({
-        open: true,
-        message: error instanceof Error ? error.message : 'Unable to place order.',
-        severity: 'error',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   return (
     <div className={styles.cartPage}>
@@ -228,41 +209,7 @@ export default function CartPage() {
           </TableContainer>
         </Container>
 
-        <aside className={styles.summary}>
-          <Typography className={styles.summaryTitle}>Summary</Typography>
-          <Stack>
-            <Typography className={styles.promoLabel}>Do you have a promo code?</Typography>
-            <Stack className={styles.promoForm} direction={'row'}>
-              <TextField className={styles.promoInput} placeholder="Enter promo code" size="small" />
-              <Button type="button" className={styles.applyButton} variant="contained">
-                Apply
-              </Button>
-            </Stack>
-          </Stack>
-
-          <Stack className={`${styles.summaryLine} ${styles.light}`} direction={'row'}>
-            <Typography>Subtotal</Typography>
-            <Typography>{currency.format(subtotal)}</Typography>
-          </Stack>
-          <Stack className={styles.summaryLine} direction={'row'}>
-            <Typography>Shipping</Typography>
-            <Typography>TBD</Typography>
-          </Stack>
-          <Stack className={styles.summaryLine} direction={'row'}>
-            <Typography>Sales Tax</Typography>
-            <Typography>{currency.format(0)}</Typography>
-          </Stack>
-          <Stack className={styles.estimateTotal} direction={'row'}>
-            <Typography>Estimated Total</Typography>
-            <Typography>{currency.format(subtotal)}</Typography>
-          </Stack>
-
-          <Button type="button" className={styles.checkoutButton} disabled={loading || items.length === 0} onClick={checkout} variant="contained">
-            Checkout
-          </Button>
-
-          <Typography className={styles.helpText}>Need help? Call us at 91-6201478596</Typography>
-        </aside>
+        
       </Box>
 
       <Snackbar open={notification.open} autoHideDuration={4000} onClose={() => setNotification((current) => ({ ...current, open: false }))}>
