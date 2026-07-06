@@ -56,7 +56,8 @@ export default function CartSummary() {
   return (
     <Paper component={'aside'} className={styles.summary} elevation={2}>
       <Typography className={styles.summaryTitle}>Summary</Typography>
-      <Stack>
+      {/* TODO: Implement this in features */}
+      <Stack sx={{ display: 'none' }}>
         <Typography variant="body2">Do you have a promo code?</Typography>
         <Stack direction={'row'} spacing={1}>
           <TextField
@@ -66,13 +67,7 @@ export default function CartSummary() {
             value={promoCode}
             onChange={(event) => setPromoCode(event.target.value)}
           />
-          <Button
-            type="button"
-            className={styles.applyButton}
-            variant="contained"
-            disabled={!promoCode.trim()}
-            onClick={applyPromoCode}
-          >
+          <Button type="button" className={styles.applyButton} variant="contained" disabled={!promoCode.trim()} onClick={applyPromoCode}>
             Apply
           </Button>
         </Stack>
@@ -85,7 +80,9 @@ export default function CartSummary() {
 
       <Stack spacing={1.5}>
         <Stack className={`${styles.summaryLine} ${styles.light}`} direction={'row'}>
-          <Typography>{itemCount} item{itemCount === 1 ? '' : 's'}</Typography>
+          <Typography>
+            {itemCount} item{itemCount === 1 ? '' : 's'}
+          </Typography>
           <Typography>{currency.format(subtotal)}</Typography>
         </Stack>
         <Stack className={styles.summaryLine} direction={'row'}>

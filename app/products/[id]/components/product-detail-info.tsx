@@ -15,7 +15,6 @@ type ProductDetailInfoProps = {
 
 export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
   const isOutOfStock = product.stock <= 0;
-
   return (
     <Stack spacing={3}>
       <Stack spacing={1}>

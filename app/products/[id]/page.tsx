@@ -1,22 +1,27 @@
-import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth';
 import { getProduct } from '@/lib/crud/product';
-import { getUserByEmail } from '@/lib/crud/user';
-import { getCartItems } from '@/lib/crud/cart';
-import ProductDetailPage from './product-detail-client';
+import { Container, Stack, Typography } from '@mui/material';
+import ProductImageGallery from './components/product-image-gallery';
+import { notFound } from 'next/navigation';
+import ProductDetailInfo from './components/product-detail-info';
+import ProductControls from './components/product-controls';
+import { getAllProductReviews } from '@/services/review/get-review';
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const session = await getSession();
-  const email = session?.email;
-  if (!email) redirect('/login');
-  const user = await getUserByEmail(email);
-  if (!user) redirect('/login');
   const { id } = await params;
   const product = await getProduct(id);
-  if (!product) redirect('/products');
+  if (!product) return notFound();
+  const review = await getAllProductReviews(product.id);
 
-  const cartItems = await getCartItems(email);
-  const cartItem = cartItems.find((item) => item.productId === product.id) || null;
-
-  return <ProductDetailPage product={product} user={user} cartItem={cartItem} />;
+  return (
+    <Container maxWidth="xl" sx={{ py: 4, paddingTop: 10 }}>
+      <Stack direction={'row'} spacing={4}>
+        <ProductImageGallery product={product} />
+        <Stack>
+          <ProductDetailInfo product={product} />
+          <ProductControls product={product} />
+        </Stack>
+      </Stack>
+      {review ? JSON.stringify(review) : <Typography>No review for this product yet..!!</Typography>}
+    </Container>
+  );
 }

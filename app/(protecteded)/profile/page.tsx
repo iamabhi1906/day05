@@ -2,11 +2,11 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { getUserAddresses } from '@/lib/crud/address';
 import { getUserByEmail } from '@/lib/crud/user';
-import { Box, Container, Grid, Paper, Typography } from '@mui/material';
+import { Container, Grid, Typography } from '@mui/material';
 import ProfileInfo from './components/profile-Info';
-import { getBuyerOrders } from '@/lib/crud/order';
 import ProfileTabs from './components/profile-tabs';
 import styles from './profile.module.css';
+import { getBuyerOrders } from '@/services/orders/get-buyer-orders';
 
 export default async function Page() {
   const session = await getSession();
@@ -17,7 +17,7 @@ export default async function Page() {
   const user = await getUserByEmail(email);
   if (!user) redirect('/login');
   const addresses = await getUserAddresses(email);
-  const orders = await getBuyerOrders(email);
+  const orders = await getBuyerOrders();
 
   return (
     <Container className={styles.page}>

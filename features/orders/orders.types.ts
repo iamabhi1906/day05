@@ -27,7 +27,7 @@ export const ordersSchema = z
     id: z.string().optional(),
 
     orderId: z.number(),
-    
+
     buyerEmail: z.email('Need a valid email'),
 
     placedAt: firestoreDate,

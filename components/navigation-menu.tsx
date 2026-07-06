@@ -8,13 +8,14 @@ import { AppDispatch, RootState } from '@/app/store';
 import { getUserCartItemsAsync } from '@/features/cart/cart.actions';
 import { resetCartState } from '@/features/cart/cart.slice';
 import { clearUserData } from '@/features/user/user.slice';
-import { AccountCircle, Inventory, LocalMall, Login, Logout, ReceiptLong, ShoppingCart } from '@mui/icons-material';
+import { AccountCircle, Inventory, LocalMall, Login, Logout, ReceiptLong, ShoppingCart, SupportAgent } from '@mui/icons-material';
 import styles from './css/navigation.module.css';
 
 const buyerPages = [
   { label: 'Products', href: '/products', icon: <LocalMall fontSize="small" /> },
   { label: 'Cart', href: '/cart', icon: <ShoppingCart fontSize="small" /> },
   { label: 'Orders', href: '/orders', icon: <ReceiptLong fontSize="small" /> },
+  { label: 'Chats', href: '/orders/chats', icon: <SupportAgent fontSize="small" /> },
 ];
 
 import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
@@ -23,6 +24,7 @@ const vendorPages = [
   { label: 'Products', href: '/products', icon: <LocalMall fontSize="small" /> },
   { label: 'Manage', href: '/vendor/products', icon: <Inventory fontSize="small" /> },
   { label: 'Orders', href: '/vendor/orders', icon: <ReceiptLong fontSize="small" /> },
+  { label: 'Chats', href: '/vendor/chats', icon: <SupportAgent fontSize="small" /> },
   { label: 'Profile', href: '/profile', icon: <AccountCircle fontSize="small" /> },
 ];
 

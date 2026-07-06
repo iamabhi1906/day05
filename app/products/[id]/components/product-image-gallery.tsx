@@ -1,21 +1,25 @@
 'use client';
 
+import { ProductData } from '@/features/product/product.types';
 import { CardMedia, Stack } from '@mui/material';
+import { useState } from 'react';
 
 type ProductImageGalleryProps = {
-  imageUrls: string[];
-  currentImageIndex: number;
-  productName: string;
-  onSelectImage: (index: number) => void;
+  product: ProductData;
 };
 
-export default function ProductImageGallery({ imageUrls, currentImageIndex, productName, onSelectImage }: ProductImageGalleryProps) {
+export default function ProductImageGallery({ product }: ProductImageGalleryProps) {
+  const imageUrls = product.imageUrls;
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  function onSelectImage(index: number) {
+    setCurrentIndex(index);
+  }
   return (
     <Stack spacing={2}>
       <CardMedia
         component="img"
-        image={imageUrls[currentImageIndex]}
-        alt={productName}
+        image={imageUrls[currentIndex]}
+        alt={product.name}
         sx={{
           width: '100%',
           height: 400,
@@ -28,10 +32,10 @@ export default function ProductImageGallery({ imageUrls, currentImageIndex, prod
         <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1 }}>
           {imageUrls.map((image, index) => (
             <CardMedia
-              key={`${productName}-${index}`}
+              key={`${product.name}-${index}`}
               component="img"
               image={image}
-              alt={`${productName} ${index + 1}`}
+              alt={`${product.name} ${index + 1}`}
               onClick={() => onSelectImage(index)}
               sx={{
                 width: 80,
@@ -40,7 +44,7 @@ export default function ProductImageGallery({ imageUrls, currentImageIndex, prod
                 flexShrink: 0,
                 objectFit: 'cover',
                 cursor: 'pointer',
-                border: currentImageIndex === index ? '2px solid #1976d2' : '2px solid #e0e0e0',
+                border: currentIndex === index ? '2px solid #1976d2' : '2px solid #e0e0e0',
                 transition: 'all 0.2s',
                 '&:hover': { borderColor: '#1976d2' },
               }}

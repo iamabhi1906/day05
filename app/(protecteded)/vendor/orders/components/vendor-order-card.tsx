@@ -1,7 +1,8 @@
-import { Avatar, Box, Button, Chip, Divider, InputLabel, LinearProgress, MenuItem, Paper, Select, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Chip, Divider, LinearProgress, MenuItem, Paper, Select, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { OrderData, OrderPaymentStatus, OrderStatus } from '@/features/orders/orders.types';
 import { LocalShippingOutlined } from '@mui/icons-material';
+import { currency } from '@/lib/currency';
 
 interface VendorOrderCardProps {
   order: {
@@ -82,10 +83,10 @@ export default function VendorOrderCard({ order, action }: VendorOrderCardProps)
           </Box>
 
           <Box component="form" action={action} sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.2, alignItems: 'center' }}>
-            {/* <InputLabel type="hidden" name="orderId" value={order.orderId} /> */}
-            <Select name="status" defaultValue={activeStatus}>
+            <input type="hidden" name="orderId" value={order.orderId} />
+            <Select name="status" defaultValue={activeStatus} sx={{ textTransform: 'capitalize' }}>
               {statusOptions.map((status) => (
-                <MenuItem key={status} value={status}>
+                <MenuItem key={status} value={status} sx={{ textTransform: 'capitalize' }}>
                   {status}
                 </MenuItem>
               ))}
@@ -164,7 +165,7 @@ export default function VendorOrderCard({ order, action }: VendorOrderCardProps)
                   Vendor: {product.vendorEmail}
                 </Typography>
                 <Typography variant="body2" color="primary.main" sx={{ fontWeight: 700 }}>
-                  Item total: ₹{(product.productPrice * product.quantity).toLocaleString()}
+                  Item total: {currency.format(product.productPrice * product.quantity)}
                 </Typography>
               </Box>
 
