@@ -1,7 +1,8 @@
-import { OrderData, OrderPaymentStatus, OrderStatus } from '@/features/orders/orders.types';
-import { LocalShipping } from '@mui/icons-material';
-import { Box, Card, Chip, ChipProps, ChipPropsColorOverrides, Divider, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardContent, Chip, Divider, Stack, Typography } from '@mui/material';
+import { LocalShipping, SupportAgent } from '@mui/icons-material';
 import Image from 'next/image';
+import styles from './order-product-card.module.css';
+import { OrderData, OrderPaymentStatus, OrderStatus } from '@/features/orders/orders.types';
 
 interface OrderProductCardProps {
   order: {
@@ -10,7 +11,7 @@ interface OrderProductCardProps {
   };
 }
 
-const getOrderStatusColor = (status: OrderStatus): ChipProps['color'] => {
+const getOrderStatusColor = (status: OrderStatus) => {
   switch (status) {
     case OrderStatus.CANCELLED:
     case OrderStatus.RETURNED:
@@ -32,35 +33,65 @@ const getOrderStatusColor = (status: OrderStatus): ChipProps['color'] => {
 
 export default function OrderProductCard({ order }: OrderProductCardProps) {
   return (
-    <Card>
-      <Stack direction={'row'} spacing={1}>
-        <LocalShipping />
-        <Stack>
-          <Typography>Order: #{order.orderId}</Typography>
-          <Typography variant="caption">Placed on: {new Date(order.products[0].placedAt).toLocaleString()}</Typography>
-        </Stack>
-      </Stack>
-      <Divider />
-      {order.products.map((product) => (
-        <Box key={product.productId}>
-          <Image src={product.productImageUrls[0]} alt={product.productName} height={150} width={150} />
+    <Card className={styles.card} elevation={2}>
+      <CardContent className={styles.header}>
+        <Stack direction="row" spacing={2}>
+          <Avatar className={styles.avatar}>
+            <LocalShipping />
+          </Avatar>
+
           <Box>
-            <Stack>
-              <Typography>{product.productName}</Typography>
-              <Typography>vendor: {product.vendorEmail}</Typography>
-              <Typography>{product.productPrice}</Typography>
-              <Typography>Qty: {product.quantity}</Typography>
-            </Stack>
-            <Stack>
+            <Typography variant="h6">Order #{order.orderId}</Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              Placed on {new Date(order.products[0].placedAt).toLocaleString()}
+            </Typography>
+          </Box>
+        </Stack>
+      </CardContent>
+
+      <Divider />
+
+      {order.products.map((product, index) => (
+        <Box key={product.productId}>
+          <Box className={styles.product}>
+            <div className={styles.imageWrapper}>
+              <Image src={product.productImageUrls[0]} alt={product.productName} width={120} height={120} className={styles.image} />
+            </div>
+
+            <Box className={styles.details}>
+              <Typography variant="h6" className={styles.productName}>
+                {product.productName}
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary">
+                Vendor: {product.vendorEmail}
+              </Typography>
+
+              <Typography className={styles.price}>₹{product.productPrice}</Typography>
+
+              <Typography variant="body2">Quantity: {product.quantity}</Typography>
+            </Box>
+
+            <Stack spacing={1} className={styles.statusSection}>
               <Chip
                 label={product.paymentStatus}
-                variant="filled"
                 color={product.paymentStatus === OrderPaymentStatus.PAID ? 'success' : 'warning'}
-                sx={{ textTransform: 'capitalize' }}
+                sx={{ textTransform: 'uppercase' }}
               />
-              <Chip label={product.status} variant={'outlined'} color={getOrderStatusColor(product.status)} sx={{ textTransform: 'capitalize' }} />
+              <Chip label={product.status} variant="filled" color={getOrderStatusColor(product.status)} sx={{ textTransform: 'uppercase' }} />
+              {product.status === OrderStatus.DELIVERED && (
+                <Button variant="outlined">
+                  <Stack direction={'row'} spacing={1}>
+                    <SupportAgent />
+                    <Typography>Need help?</Typography>
+                  </Stack>
+                </Button>
+              )}
             </Stack>
           </Box>
+
+          {index !== order.products.length - 1 && <Divider />}
         </Box>
       ))}
     </Card>

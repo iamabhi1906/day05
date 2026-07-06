@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/crud/user';
-import OrdersPage from './orders-page';
 import { Card, Container, Stack, Typography } from '@mui/material';
 import { getBuyerOrders } from '@/services/orders/get-buyer-orders';
 import OrderProductCard from './components/order-card';

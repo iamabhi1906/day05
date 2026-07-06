@@ -1,16 +1,8 @@
-import { OrderData, ordersSchema } from '@/features/orders/orders.types';
+import { OrderData } from '@/features/orders/orders.types';
 import { Protect } from '@/lib/auth';
-import { DocumentData, getDocs, orderBy, query, QueryDocumentSnapshot, where } from 'firebase/firestore';
+import { getDocs, orderBy, query, where } from 'firebase/firestore';
 import { ordersCollection } from './collections';
-
-const toDate = (value: { toDate?: () => Date } | null | undefined) => {
-  return typeof value?.toDate === 'function' ? value.toDate() : null;
-};
-
-const orderFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): OrderData => {
-  const data = snapshot.data();
-  return ordersSchema.parse(data);
-};
+import { orderFromDoc } from './shared';
 
 export const getBuyerOrders = async (): Promise<OrderData[]> => {
   const user = await Protect();
