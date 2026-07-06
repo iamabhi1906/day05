@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { Alert, Box, Button, Chip, CircularProgress, FormControlLabel, Paper, Stack, Switch, TextField, Typography } from '@mui/material';
 import { AddCircleOutlineOutlined, DeleteOutlineOutlined, EditOutlined, MyLocationOutlined } from '@mui/icons-material';
 import { createUserAddress, deleteUserAddress, getUserAddresses, setDefaultAddress, type UserAddress, updateUserAddress } from '@/lib/crud/address';
 import { UserData } from '@/lib/crud/user';
-import { AddressFormType, AddressSchema } from '@/lib/schemas/address-schema';
+import { AddressFormInput, AddressSchema } from '@/lib/schemas/address-schema';
 import styles from './profile-info.module.css';
 
 interface Props {
@@ -20,6 +21,8 @@ type AddressAutofill = {
   state?: string;
   landmark?: string;
 };
+
+type AddressFormType = z.infer<typeof AddressSchema>;
 
 const emptyAddressValues: AddressFormType = {
   city: '',
@@ -75,7 +78,7 @@ export default function UserAddressTab({ user, address }: Props) {
   const [autofillStatus, setAutofillStatus] = useState<{ type: 'success' | 'info' | 'error'; message: string } | null>(null);
   const lastAutoFetchPinCodeRef = useRef<string | null>(null);
 
-  const { control, getValues, reset, setValue, trigger } = useForm<AddressFormType>({
+  const { control, getValues, reset, setValue, trigger } = useForm<AddressFormInput>({
     resolver: zodResolver(AddressSchema),
     defaultValues: emptyAddressValues,
   });
@@ -135,7 +138,7 @@ export default function UserAddressTab({ user, address }: Props) {
     lastAutoFetchPinCodeRef.current = String(selectedAddress.pinCode);
   };
 
-  const handleAddressSubmit = async (formData: AddressFormType) => {
+  const handleAddressSubmit = async (formData: AddressFormInput) => {
     try {
       setSubmitting(true);
       const payload = {
@@ -284,7 +287,7 @@ export default function UserAddressTab({ user, address }: Props) {
                   {...field}
                   fullWidth
                   label="Pin Code"
-                  inputProps={{ maxLength: 6 }}
+                  type="number"
                   error={!!fieldState.error}
                   helperText={fieldState.error?.message ?? 'Use this to auto-fill the address details.'}
                 />

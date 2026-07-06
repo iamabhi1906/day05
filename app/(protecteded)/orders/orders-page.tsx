@@ -110,21 +110,13 @@ const getSubtotal = (order: OrderCardData) => {
 
 const renderStatus = (status: string) => {
   const normalized = status.toLowerCase();
-  return (
-    <span className={`${styles.badge} ${statusClassMap[normalized] ?? styles.statusCreated}`}>
-      {status}
-    </span>
-  );
+  return <span className={`${styles.badge} ${statusClassMap[normalized] ?? styles.statusCreated}`}>{status}</span>;
 };
 
 const renderPayment = (paymentStatus?: string) => {
   if (!paymentStatus) return null;
   const normalized = paymentStatus.toLowerCase();
-  return (
-    <span className={`${styles.badge} ${paymentClassMap[normalized] ?? styles.paymentPaid}`}>
-      {paymentStatus}
-    </span>
-  );
+  return <span className={`${styles.badge} ${paymentClassMap[normalized] ?? styles.paymentPaid}`}>{paymentStatus}</span>;
 };
 
 export default function OrdersPage({ orders, title = 'Orders', showBuyerEmail }: OrdersPageProps) {
@@ -149,7 +141,7 @@ export default function OrdersPage({ orders, title = 'Orders', showBuyerEmail }:
             const placedAt = 'placedAt' in order ? order.placedAt : order.createdAt;
             const lines = getLines(order);
             const subtotal = getSubtotal(order);
-            const discount = 'discount' in order ? order.discount ?? 0 : 0;
+            const discount = 'discount' in order ? (order.discount ?? 0) : 0;
             const productImageUrl = getImageUrl(order);
             const paymentStatus = 'paymentStatus' in order ? order.paymentStatus : undefined;
 
@@ -163,7 +155,7 @@ export default function OrdersPage({ orders, title = 'Orders', showBuyerEmail }:
                     {showBuyerEmail && buyerEmail ? <p className={styles.orderMeta}>Buyer: {buyerEmail}</p> : null}
                   </div>
                   <div className={styles.badgesRow}>
-                    {renderStatus('status' in order ? order.status : String(order.status))}
+                    {renderStatus(order.status)}
                     {renderPayment(paymentStatus)}
                   </div>
                 </div>
@@ -172,7 +164,7 @@ export default function OrdersPage({ orders, title = 'Orders', showBuyerEmail }:
                   {lines.length > 1 ? (
                     <div className={styles.itemsGrid}>
                       {lines.map((line, index) => (
-                        <div key={`${order.id ?? order.orderId}-${index}`} className={styles.itemCard}>
+                        <div key={`${order.id ?? order.id}-${index}`} className={styles.itemCard}>
                           <div className={styles.imageWrapper}>
                             {line.imageUrl ? (
                               <img src={line.imageUrl} alt={line.productName} className={styles.productImage} />
@@ -200,7 +192,9 @@ export default function OrdersPage({ orders, title = 'Orders', showBuyerEmail }:
                       <div className={styles.productDetails}>
                         <p className={styles.productName}>{lines[0].productName}</p>
                         <div className={styles.productInfoRow}>
-                          <span>{lines[0].quantity} item{lines[0].quantity === 1 ? '' : 's'}</span>
+                          <span>
+                            {lines[0].quantity} item{lines[0].quantity === 1 ? '' : 's'}
+                          </span>
                           <span>• {formatCurrency(lines[0].price)} each</span>
                           {lines[0].vendorEmail ? <span>• Vendor: {lines[0].vendorEmail}</span> : null}
                         </div>

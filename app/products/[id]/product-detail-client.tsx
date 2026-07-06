@@ -62,7 +62,7 @@ export default function ProductDetailPage({ product, user, cartItem: initialCart
     }
   };
 
-  const imageUrls = product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : [product.imageUrl];
+  const imageUrls = product.imageUrls;
   const isOutOfStock = product.stock <= 0;
 
   return (

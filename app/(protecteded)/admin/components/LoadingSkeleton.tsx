@@ -4,7 +4,7 @@ export default function LoadingSkeleton({ count = 3 }: { count?: number }) {
   return (
     <Grid container spacing={3}>
       {Array.from({ length: count }).map((_, i) => (
-        <Grid item xs={12} sm={6} md={4} key={i}>
+        <Grid key={i}>
           <Card variant="outlined">
             <CardContent>
               <Stack spacing={1}>

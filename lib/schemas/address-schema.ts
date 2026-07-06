@@ -8,4 +8,5 @@ export const AddressSchema = z.object({
   isDefault: z.boolean().default(false),
 });
 
-export type AddressFormType = z.infer<typeof AddressSchema>;
+export type AddressFormType = z.output<typeof AddressSchema>;
+export type AddressFormInput = z.input<typeof AddressSchema>;
