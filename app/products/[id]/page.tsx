@@ -5,12 +5,13 @@ import { notFound } from 'next/navigation';
 import ProductDetailInfo from './components/product-detail-info';
 import ProductControls from './components/product-controls';
 import { getAllProductReviews } from '@/services/review/get-review';
+import ReviewCard from './components/review-card';
 
 export default async function Page({ params }: { params: { id: string } }) {
   const { id } = await params;
   const product = await getProduct(id);
   if (!product) return notFound();
-  const review = await getAllProductReviews(product.id);
+  const reviews = await getAllProductReviews(product.id);
 
   return (
     <Container maxWidth="xl" sx={{ py: 4, paddingTop: 10 }}>
@@ -21,7 +22,15 @@ export default async function Page({ params }: { params: { id: string } }) {
           <ProductControls product={product} />
         </Stack>
       </Stack>
-      {review ? JSON.stringify(review) : <Typography>No review for this product yet..!!</Typography>}
+      {reviews ? (
+        <Stack direction={'row'} sx={{paddingTop: 5}}>
+          {reviews.map((review) => (
+            <ReviewCard review={review} />
+          ))}
+        </Stack>
+      ) : (
+        <Typography>No review for this product yet..!!</Typography>
+      )}
     </Container>
   );
 }
