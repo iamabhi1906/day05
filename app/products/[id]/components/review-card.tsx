@@ -8,10 +8,9 @@ export default function ReviewCard({ review }: { review: Review }) {
       sx={{
         border: 1,
         borderColor: 'divider',
-        borderRadius: 3,
         bgcolor: 'background.paper',
       }}
-      key={review.id}
+      
     >
       <CardContent>
         <Stack spacing={2}>

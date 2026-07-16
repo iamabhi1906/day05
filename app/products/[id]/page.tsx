@@ -23,9 +23,9 @@ export default async function Page({ params }: { params: { id: string } }) {
         </Stack>
       </Stack>
       {reviews ? (
-        <Stack direction={'row'} sx={{paddingTop: 5}}>
+        <Stack direction={'row'} sx={{ paddingTop: 5 }}>
           {reviews.map((review) => (
-            <ReviewCard review={review} />
+            <ReviewCard review={review} key={review.id} />
           ))}
         </Stack>
       ) : (
