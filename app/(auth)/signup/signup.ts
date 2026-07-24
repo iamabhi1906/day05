@@ -1,8 +1,6 @@
-import { auth } from '@/lib/firebase';
-import { FirebaseError } from 'firebase/app';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { createSession } from '../auth-session';
-import { createUser } from '@/lib/crud/user';
+import api from '@/lib/api/api';
+import axios from 'axios';
+import { ApiError } from 'next/dist/server/api-utils';
 
 export async function EmailSignup(name: string, email: string, password: string, role: string) {
   try {
@@ -15,20 +13,15 @@ export async function EmailSignup(name: string, email: string, password: string,
     if (!role) {
       throw new Error('Please provide a valid role!');
     }
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    const user = await createUser(result.user, role, name);
-    const idToken = await result.user.getIdToken();
-    await createSession(idToken);
+    const result = await api.post('/auth/signup', { name, email, password, role });
   } catch (error: unknown) {
-    if (error instanceof FirebaseError && error.code === 'auth/email-already-in-use') {
-      throw new Error('Email already in use');
-    } else if (error instanceof FirebaseError && error.code === 'auth/invalid-email') {
-      throw new Error('Invalid email format');
-    } else if (error instanceof FirebaseError && error.code === 'auth/weak-password') {
-      throw new Error('Password is too weak');
-    } else {
-      console.log(error);
-      throw Error('Signup failed');
+    console.log(error);
+    if (axios.isAxiosError<ApiError>(error)) {
+      throw new Error(error.response?.data?.message ?? 'Signup failed');
     }
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Signup failed');
   }
 }

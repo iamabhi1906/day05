@@ -42,7 +42,7 @@ export const ordersSchema = z
 
     productPrice: z.coerce.number().positive('Product price must be greater than 0'),
 
-    productImageUrls: z.array(z.string()),
+    productproductImages: z.array(z.string()),
 
     discount: z.coerce.number().min(0, 'Discount cannot be negative').default(0),
 

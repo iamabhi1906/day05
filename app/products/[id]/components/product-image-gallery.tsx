@@ -9,7 +9,7 @@ type ProductImageGalleryProps = {
 };
 
 export default function ProductImageGallery({ product }: ProductImageGalleryProps) {
-  const imageUrls = product.imageUrls;
+  const productImages = product.productImages;
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   function onSelectImage(index: number) {
     setCurrentIndex(index);
@@ -18,7 +18,7 @@ export default function ProductImageGallery({ product }: ProductImageGalleryProp
     <Stack spacing={2}>
       <CardMedia
         component="img"
-        image={imageUrls[currentIndex]}
+        image={productImages[currentIndex]}
         alt={product.name}
         sx={{
           width: '100%',
@@ -28,9 +28,9 @@ export default function ProductImageGallery({ product }: ProductImageGalleryProp
           backgroundColor: '#f5f5f5',
         }}
       />
-      {imageUrls.length > 1 && (
+      {productImages.length > 1 && (
         <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1 }}>
-          {imageUrls.map((image, index) => (
+          {productImages.map((image, index) => (
             <CardMedia
               key={`${product.name}-${index}`}
               component="img"

@@ -85,7 +85,7 @@ export function OrderCard({ order, showReview = false }: { order: OrderData; sho
     <Box key={order.productId}>
       <Box className={styles.product}>
         <div className={styles.imageWrapper}>
-          <Image src={order.productImageUrls[0]} alt={order.productName} width={120} height={120} className={styles.image} />
+          <Image src={order.productproductImages[0]} alt={order.productName} width={120} height={120} className={styles.image} />
         </div>
 
         <Box className={styles.details}>

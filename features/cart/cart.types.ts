@@ -5,7 +5,7 @@ export const CartSchema = z.object({
   buyerEmail: z.email().nullable(),
   productId: z.string(),
   productName: z.string(),
-  productImageUrls: z.array(z.string()),
+  productproductImages: z.array(z.string()),
   vendorEmail: z.string(),
   price: z.number(),
   quantity: z.number(),

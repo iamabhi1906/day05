@@ -1,19 +1,15 @@
 import { redirect } from 'next/navigation';
 import VendorProducts from './vendor-products';
-import { getSession } from '@/lib/auth';
-import { getUserByEmail } from '@/lib/crud/user';
 import { getVendorProducts } from '@/lib/crud/product';
+import { serverApi } from '@/lib/api/server.api';
 
 export default async function Page() {
-  const session = await getSession();
-  const email = session?.email;
-  if (!email) redirect('/login');
-
-  const user = await getUserByEmail(email);
+  const api = await serverApi();
+  const { data: user } = await api.get('/auth/me');
   if (!user) redirect('/login');
   if (user.role !== 'vendor') redirect('/products');
 
-  const products = await getVendorProducts(email);
+  const products = await getVendorProducts();
 
-  return <VendorProducts initialProducts={products} user={user} />;
+  return <VendorProducts initialProducts={products} />;
 }

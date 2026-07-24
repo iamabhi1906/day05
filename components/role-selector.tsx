@@ -97,7 +97,7 @@ export default function UserRoleSelect({ user }: { user: UserData }) {
           <Stack spacing={3}>
             <Box className={styles.heroSection}>
               <Box className={styles.heroIconWrap}>
-                <MainLogo width={100}/>
+                <MainLogo width={100} />
               </Box>
               <Typography variant="h5" className={styles.heading}>
                 Welcome to StyleStreet
@@ -172,12 +172,7 @@ export default function UserRoleSelect({ user }: { user: UserData }) {
         </CardContent>
       </Card>
 
-      <Snackbar
-        open={open}
-        autoHideDuration={6000}
-        onClose={handleClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         <Alert onClose={handleClose} severity={messageType} className={styles.alert}>
           {message}
         </Alert>

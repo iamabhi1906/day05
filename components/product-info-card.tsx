@@ -15,7 +15,7 @@ export default async function ProductInfoCard({ productId }: { productId: string
       <Card elevation={0}>
         <Box className={styles.wrapper}>
           <Box className={styles.imageSection}>
-            <Image src={product.imageUrls?.[0]} alt={product.name} className={styles.image} width={200} height={200} />
+            <Image src={product.productImages?.[0]} alt={product.name} className={styles.image} width={200} height={200} />
             <Box>
               <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" sx={{ fontWeight: 700 }}>

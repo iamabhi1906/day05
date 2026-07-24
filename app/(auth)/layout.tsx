@@ -1,11 +1,12 @@
 import { Grid } from '@mui/material';
 import SideInfo from './side-info';
-import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { serverApi } from '@/lib/api/server.api';
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSession();
-  if (session) redirect('/');
+  const api = await serverApi();
+  const { data: user } = await api.get('/auth/me');
+  if (user) redirect('/');
   return (
     <Grid container>
       <Grid size={4}>{children}</Grid>

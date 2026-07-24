@@ -5,7 +5,8 @@ import styles from '@/app/_css/layout.module.css';
 import { Box } from '@mui/material';
 import Providers from './providers';
 import NavigationBar from '@/components/navigation-bar';
-import { getSession } from '@/lib/auth';
+import { serverApi } from '@/lib/api/server.api';
+import { UserData } from '@/features/user/user.types';
 
 export const metadata: Metadata = {
   title: 'StyleStreet',
@@ -17,11 +18,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
+  let user: UserData | null = null;
+  try {
+    const api = await serverApi();
+    const { data: userResponse } = await api.get('/auth/me');
+    user = userResponse;
+  } catch (error) {
+    console.error('Failed to fetch user data:', error);
+  }
   return (
     <html lang="en" className={`${lato.className} ${inter.className} ${styles.mainBody}`}>
       <body>
-        <Providers session={session}>
+        <Providers user={user}>
           <NavigationBar />
           <Box className={styles.body}>{children}</Box>
         </Providers>

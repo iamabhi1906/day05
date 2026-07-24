@@ -153,7 +153,7 @@ export default function CartPage() {
                       <TableCell className={styles.productCell}>
                         <Box className={styles.productCellInner}>
                           <Image
-                            src={item.productImageUrls[0] || ''}
+                            src={item.productproductImages[0] || ''}
                             width={1000}
                             height={1000}
                             alt={item.productName}

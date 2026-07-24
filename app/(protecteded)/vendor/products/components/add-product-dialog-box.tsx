@@ -7,29 +7,24 @@ import { CldUploadWidget } from 'next-cloudinary';
 import { Controller, useForm } from 'react-hook-form';
 import { CloudinaryInfo } from '../types';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ProductFormDataInput, ProductFormDataOutput, ProductInputSchema } from '@/features/product/product.types';
-import { UserData } from '@/features/user/user.types';
 import { createProduct } from '@/lib/crud/product';
 import { enqueueSnackbar } from 'notistack';
 
 interface AddProductDialogBoxProps {
   open: boolean;
   onClose: () => void;
-  userData: UserData;
 }
 
-export default function AddProductDialogBox({ open, onClose, userData }: AddProductDialogBoxProps) {
+export default function AddProductDialogBox({ open, onClose }: AddProductDialogBoxProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { control, handleSubmit, setValue, getValues } = useForm<ProductFormDataInput, any, ProductFormDataOutput>({
     resolver: zodResolver(ProductInputSchema),
     mode: 'onSubmit',
   });
   const [addProductLoading, setAddProductLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    setValue('vendorName', userData.name);
-    setValue('vendorEmail', userData.email);
-  }, [setValue, userData.email, userData.name]);
   const categoriesOptions = categories
     .filter(({ value }) => value !== null && value !== undefined)
     .map(({ label, value }) => ({
@@ -57,27 +52,17 @@ export default function AddProductDialogBox({ open, onClose, userData }: AddProd
         <DialogTitle>Add Product</DialogTitle>
         <DialogContent dividers={true}>
           <Stack spacing={2}>
-            <InputField control={control} label="Enter product name" name="name" type="text" />
+            <InputField control={control} label="Enter product name" name="title" type="text" />
             <InputField control={control} label="Enter product description" name="description" />
             <InputField control={control} label="Select category" name="category" type="select" options={categoriesOptions} />
             <Stack direction={'row'} spacing={2}>
               <InputField control={control} label="Price of Product" name="price" type="number" />
               <InputField control={control} label="Enter stock quantity" name="stock" type="number" />
             </Stack>
-            <InputField
-              control={control}
-              label="Set your Product Status"
-              name="status"
-              type="radio"
-              options={[
-                { label: 'Draft', value: 'draft' },
-                { label: 'Published', value: 'published' },
-              ]}
-            />
 
             <Controller
               control={control}
-              name="imageUrls"
+              name="productImages"
               render={({ field, fieldState }) => (
                 <>
                   <Stack direction="row" spacing={1}>
@@ -96,9 +81,9 @@ export default function AddProductDialogBox({ open, onClose, userData }: AddProd
 
                       if (!info.secure_url) return;
 
-                      const currentImages = getValues('imageUrls') || [];
+                      const currentImages = getValues('productImages') || [];
 
-                      setValue('imageUrls', [...currentImages, info.secure_url], {
+                      setValue('productImages', [...currentImages, info.secure_url], {
                         shouldValidate: true,
                       });
                     }}

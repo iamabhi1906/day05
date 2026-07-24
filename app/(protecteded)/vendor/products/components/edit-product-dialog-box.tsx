@@ -19,6 +19,7 @@ interface EditProductDialogBoxProps {
 }
 
 export default function EditProductDialogBox({ open, onClose, productData }: EditProductDialogBoxProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { control, handleSubmit, setValue, getValues, reset } = useForm<ProductEditInput, any, ProductEditOutput>({
     resolver: zodResolver(ProductEditSchema),
     mode: 'onSubmit',
@@ -27,13 +28,12 @@ export default function EditProductDialogBox({ open, onClose, productData }: Edi
 
   useEffect(() => {
     reset({
-      name: productData.name,
+      title: productData.title,
       description: productData.description,
       category: productData.category,
       price: productData.price,
       stock: productData.stock,
-      status: productData.status,
-      imageUrls: productData.imageUrls,
+      productImages: productData.productImages,
     });
   }, [productData, reset]);
 
@@ -64,27 +64,17 @@ export default function EditProductDialogBox({ open, onClose, productData }: Edi
         <DialogTitle>Edit Product</DialogTitle>
         <DialogContent dividers={true}>
           <Stack spacing={2}>
-            <InputField control={control} label="Enter product name" name="name" type="text" />
+            <InputField control={control} label="Enter product name" name="title" type="text" />
             <InputField control={control} label="Enter product description" name="description" />
             <InputField control={control} label="Select category" name="category" type="select" options={categoriesOptions} />
             <Stack direction={'row'} spacing={2}>
               <InputField control={control} label="Price of Product" name="price" type="number" />
               <InputField control={control} label="Enter stock quantity" name="stock" type="number" />
             </Stack>
-            <InputField
-              control={control}
-              label="Set your Product Status"
-              name="status"
-              type="radio"
-              options={[
-                { label: 'Draft', value: 'draft' },
-                { label: 'Published', value: 'published' },
-              ]}
-            />
 
             <Controller
               control={control}
-              name="imageUrls"
+              name="productImages"
               render={({ field, fieldState }) => (
                 <>
                   <Stack direction="row" spacing={1}>
@@ -103,9 +93,9 @@ export default function EditProductDialogBox({ open, onClose, productData }: Edi
 
                       if (!info.secure_url) return;
 
-                      const currentImages = getValues('imageUrls') || [];
+                      const currentImages = getValues('productImages') || [];
 
-                      setValue('imageUrls', [...currentImages, info.secure_url], {
+                      setValue('productImages', [...currentImages, info.secure_url], {
                         shouldValidate: true,
                       });
                     }}

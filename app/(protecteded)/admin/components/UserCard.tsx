@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Card, CardActions, CardContent, Divider, Button, Stack, Typography, Chip } from '@mui/material';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined';
@@ -11,7 +12,17 @@ type User = {
   isBlocked?: boolean;
 };
 
-export default function UserCard({ user, isSelf, toggleAction, deleteAction }: { user: User; isSelf: boolean; toggleAction: any; deleteAction: any }) {
+export default function UserCard({
+  user,
+  isSelf,
+  toggleAction,
+  deleteAction,
+}: {
+  user: User;
+  isSelf: boolean;
+  toggleAction: any;
+  deleteAction: any;
+}) {
   return (
     <Card className={styles.cardRoot} variant="outlined">
       <CardContent>
@@ -28,7 +39,12 @@ export default function UserCard({ user, isSelf, toggleAction, deleteAction }: {
             Role: {user.role}
           </Typography>
           <Stack sx={{ flexDirection: 'row', alignItems: 'center' }} spacing={1}>
-            <Chip label={user.isBlocked ? 'Blocked' : 'Active'} color={user.isBlocked ? 'error' : 'success'} size="small" className={styles.statusChip} />
+            <Chip
+              label={user.isBlocked ? 'Blocked' : 'Active'}
+              color={user.isBlocked ? 'error' : 'success'}
+              size="small"
+              className={styles.statusChip}
+            />
             {isSelf ? <Chip label="Current admin" variant="outlined" size="small" /> : null}
           </Stack>
         </Stack>
@@ -36,13 +52,13 @@ export default function UserCard({ user, isSelf, toggleAction, deleteAction }: {
       <Divider />
       <CardActions className={styles.cardActions}>
         <form action={toggleAction} className={styles.actionForm}>
-          <input type="hidden" name="email" value={user.email} />
+          <input type="hidden" name="id" value={user.id} />
           <Button type="submit" color={user.isBlocked ? 'success' : 'warning'} variant="outlined" startIcon={<BlockIcon />} disabled={isSelf}>
             {user.isBlocked ? 'Unblock' : 'Block'}
           </Button>
         </form>
         <form action={deleteAction} className={styles.actionForm}>
-          <input type="hidden" name="email" value={user.email} />
+          <input type="hidden" name="id" value={user.id} />
           <Button type="submit" color="error" variant="outlined" startIcon={<DeleteOutlineOutlined />} disabled={isSelf}>
             Delete
           </Button>

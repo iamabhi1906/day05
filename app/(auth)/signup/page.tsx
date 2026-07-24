@@ -45,11 +45,7 @@ export default function SignupPage() {
     severity: NotificationSeverity.SUCCESS,
   });
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isValid },
-  } = useForm<SignupFormData>({
+  const { control, handleSubmit } = useForm<SignupFormData>({
     resolver: zodResolver(SignupSchema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -113,7 +109,7 @@ export default function SignupPage() {
                 <InputField
                   name="role"
                   label=""
-                  control={control as any}
+                  control={control}
                   type="radio"
                   options={[
                     { value: 'user', label: 'Buyer' },
@@ -129,7 +125,7 @@ export default function SignupPage() {
                 <InputField name="confirmPassword" control={control} label="Confirm Password" type="password" />
               </Stack>
 
-              <Button variant="contained" fullWidth type="submit" disabled={loading || !isValid} sx={{ mt: 3 }}>
+              <Button variant="contained" fullWidth type="submit" disabled={loading} sx={{ mt: 3 }}>
                 {loading ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </form>
@@ -142,9 +138,9 @@ export default function SignupPage() {
               <Divider className={styles.divider} />
             </Box>
 
-            <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth disabled={loading} onClick={handleGoogleLogin}>
+            {/* <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth disabled={loading} onClick={handleGoogleLogin}>
               {loading ? 'Processing...' : 'Continue with Google'}
-            </Button>
+            </Button> */}
 
             <Box className={styles.loginLink}>
               <Typography variant="body2">

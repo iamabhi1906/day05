@@ -1,18 +1,8 @@
 import { UserInfo } from 'firebase/auth';
 import { db } from '../firebase';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-
-export interface UserData {
-  id: string;
-  email: string;
-  role: string;
-  uid: string;
-  name: string;
-  avatar: string | null;
-  phone: string | null;
-  createdAt: string;
-  isBlocked: boolean;
-}
+import { serverApi } from '../api/server.api';
+import { UserData } from '@/features/user/user.types';
 
 const toDateValue = (value: unknown) => {
   if (value instanceof Date) return value.toISOString();
@@ -55,27 +45,11 @@ export const createUser = async (user: UserInfo, role: string | null, name?: str
   return data;
 };
 
-export const getUserByEmail = async (email: string): Promise<UserData | null> => {
+export const getUserByEmail = async (): Promise<UserData | null> => {
   try {
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('email', '==', email));
-    const result = await getDocs(q);
-    if (result.empty) {
-      return null;
-    }
-    const userDoc = result.docs[0];
-    const data = userDoc.data();
-    return {
-      id: userDoc.id,
-      email: data.email,
-      role: data.role,
-      uid: data.uid,
-      name: data.name,
-      avatar: data.avatar,
-      phone: data.phone,
-      createdAt: toDateValue(data.createdAt),
-      isBlocked: data.isBlocked,
-    };
+    const api = await serverApi();
+    const { data: user } = await api.get('/auth/me');
+    return user as UserData;
   } catch (error) {
     console.error('Error fetching user by email:', error);
     return null;
@@ -120,22 +94,9 @@ export const updateUserByEmail = async (
 
 export const getAllUsers = async (): Promise<UserData[]> => {
   try {
-    const usersRef = collection(db, 'users');
-    const snapshot = await getDocs(usersRef);
-    return snapshot.docs.map((userDoc) => {
-      const data = userDoc.data();
-      return {
-        id: userDoc.id,
-        email: data.email,
-        role: data.role,
-        uid: data.uid,
-        name: data.name,
-        avatar: data.avatar,
-        phone: data.phone,
-        createdAt: toDateValue(data.createdAt),
-        isBlocked: data.isBlocked,
-      };
-    });
+    const api = await serverApi();
+    const { data: users } = await api.get('admin/users');
+    return users as UserData[];
   } catch (error) {
     console.error('Error fetching all users:', error);
     return [];

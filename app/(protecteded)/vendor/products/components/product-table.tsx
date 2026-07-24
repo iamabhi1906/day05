@@ -10,6 +10,7 @@ import {
   Divider,
   Paper,
   Stack,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -18,43 +19,71 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import type { ProductTableRowProps } from '../types';
-import { ProductData } from '@/features/product/product.types';
 
-const currency = new Intl.NumberFormat('en-US', {
+import { ProductData, ProductStatus } from '@/features/product/product.types';
+
+const currency = new Intl.NumberFormat('en-IN', {
   style: 'currency',
   currency: 'INR',
 });
 
-function ProductTableRow({ product, onEdit, onDelete }: ProductTableRowProps) {
+type ProductTableRowProps = {
+  product: ProductData;
+  onEdit: (product: ProductData) => void;
+  onDelete: (productId: string) => void;
+  onStatusChange: (product: ProductData, status: ProductStatus) => void;
+};
+
+function ProductTableRow({ product, onEdit, onDelete, onStatusChange }: ProductTableRowProps) {
+  const isPublished = product.status === ProductStatus.PUBLISHED;
+
   return (
-    <TableRow key={product.id}>
+    <TableRow>
       <TableCell>
-        <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-          <CardMedia component="img" image={product.imageUrls[0]} alt={product.name} sx={{ width: 56, height: 56, borderRadius: 1 }} />
+        <Stack direction="row" spacing={1.5}>
+          <CardMedia
+            component="img"
+            image={product.productImages?.[0]}
+            alt={product.title}
+            sx={{
+              width: 56,
+              height: 56,
+              borderRadius: 1,
+              objectFit: 'cover',
+            }}
+          />
+
           <Box>
-            <Typography variant="subtitle2">{product.name}</Typography>
+            <Typography variant="subtitle2">{product.title}</Typography>
             <Typography variant="caption" color="text.secondary">
               {product.category}
             </Typography>
           </Box>
         </Stack>
       </TableCell>
+
       <TableCell>{currency.format(product.price)}</TableCell>
+
       <TableCell>{product.stock}</TableCell>
+
       <TableCell>
-        <Chip
-          label={product.status}
-          color={product.status === 'published' ? 'success' : 'default'}
-          size="small"
-          sx={{ textTransform: 'uppercase' }}
-        />
+        <Stack direction="row" spacing={1}>
+          <Switch
+            checked={isPublished}
+            color="success"
+            onChange={(e) => onStatusChange(product, e.target.checked ? ProductStatus.PUBLISHED : ProductStatus.DRAFT)}
+          />
+
+          <Chip label={product.status} color={isPublished ? 'success' : 'default'} size="small" sx={{ textTransform: 'uppercase' }} />
+        </Stack>
       </TableCell>
+
       <TableCell align="right">
-        <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
+        <Stack direction="row" spacing={1}>
           <Button size="small" startIcon={<EditIcon />} onClick={() => onEdit(product)}>
             Edit
           </Button>
+
           <Button size="small" color="error" startIcon={<DeleteIcon />} onClick={() => onDelete(product.id)}>
             Delete
           </Button>
@@ -68,9 +97,10 @@ type ProductTableProps = {
   products: ProductData[];
   onEdit: (product: ProductData) => void;
   onDelete: (productId: string) => void;
+  onStatusChange: (product: ProductData, status: ProductStatus) => void;
 };
 
-export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) {
+export function ProductTable({ products, onEdit, onDelete, onStatusChange }: ProductTableProps) {
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table>
@@ -83,20 +113,22 @@ export function ProductTable({ products, onEdit, onDelete }: ProductTableProps) 
             <TableCell align="right">Actions</TableCell>
           </TableRow>
         </TableHead>
+
         <TableBody>
-          {products.map((product) => (
-            <ProductTableRow key={product.id} product={product} onEdit={onEdit} onDelete={onDelete} />
-          ))}
-          {products.length === 0 ? (
+          {products.length > 0 ? (
+            products.map((product) => (
+              <ProductTableRow key={product.id} product={product} onEdit={onEdit} onDelete={onDelete} onStatusChange={onStatusChange} />
+            ))
+          ) : (
             <TableRow>
               <TableCell colSpan={5}>
-                <Stack spacing={1.5} sx={{ py: 5, alignItems: 'center' }}>
+                <Stack spacing={1.5}>
                   <Divider flexItem />
                   <Typography color="text.secondary">No products yet.</Typography>
                 </Stack>
               </TableCell>
             </TableRow>
-          ) : null}
+          )}
         </TableBody>
       </Table>
     </TableContainer>

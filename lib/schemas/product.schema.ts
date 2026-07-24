@@ -8,7 +8,7 @@ export const ProductSchema = z.object({
   price: z.coerce.number('Need a valid price').positive('Price must be a positive number').min(1, 'Price is required'),
   stock: z.coerce.number('Need a valid stock number').nonnegative('Stock must be a non-negative number').min(10, 'At lest 10 Stock is required'),
   status: z.enum(['draft', 'published'], { message: 'Please select a valid status' }),
-  imageUrls: z.array(z.url('Invalid image URL'), 'Need at lest one product image').min(1, 'At least one image is required'),
+  productImages: z.array(z.url('Invalid image URL'), 'Need at lest one product image').min(1, 'At least one image is required'),
 });
 
 export type ProductFormDataInput = z.input<typeof ProductSchema>;

@@ -23,8 +23,8 @@ export enum ProductCategory {
 }
 
 export enum ProductStatus {
-  PUBLISHED = 'published',
-  DRAFT = 'draft',
+  PUBLISHED = 'PUBLISHED',
+  DRAFT = 'DRAFT',
 }
 
 export interface ProductSortByOptions {
@@ -43,7 +43,7 @@ export interface GetPublishedProductsParams {
 export const ProductSchema = z.object({
   id: z.string({ error: 'Product ID is required' }),
 
-  name: z
+  title: z
     .string({ error: 'Product name is required' })
     .min(5, { error: 'Product name must be at least 5 characters long' })
     .max(100, { error: 'Product name cannot exceed 100 characters' }),
@@ -65,7 +65,7 @@ export const ProductSchema = z.object({
 
   category: z.enum(ProductCategory, { error: 'Please select a valid product category' }),
 
-  imageUrls: z
+  productImages: z
     .array(z.url({ error: 'Each item must be a valid image URL' }), {
       error: (issue) => (issue.input === undefined ? 'Please upload at least one product image' : undefined),
     })
@@ -73,24 +73,24 @@ export const ProductSchema = z.object({
     .max(10, { error: 'You cannot upload more than 10 product images' }),
 
   status: z.enum(ProductStatus, { error: 'Please select a valid product status' }),
-  vendorEmail: z.email({ error: 'Please enter a valid vendor email address' }),
-
-  vendorName: z.string({ error: 'Vendor name is required' }).min(2, { error: 'Vendor name must be at least 2 characters long' }),
-
+  userId: z.string(),
   createdAt: z.coerce.date().nullable().optional(),
-
   updatedAt: z.coerce.date().nullable().optional(),
 });
 
 export const ProductInputSchema = ProductSchema.omit({
   id: true,
+  userId: true,
+  status: true,
   createdAt: true,
   updatedAt: true,
 });
-
-export const ProductEditSchema = ProductInputSchema.omit({
-  vendorEmail: true,
-  vendorName: true,
+export const ProductEditSchema = ProductSchema.omit({
+  id: true,
+  userId: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export type ProductData = z.infer<typeof ProductSchema>;

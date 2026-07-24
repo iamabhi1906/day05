@@ -19,6 +19,7 @@ const buyerPages = [
 ];
 
 import AdminPanelSettings from '@mui/icons-material/AdminPanelSettings';
+import api from '@/lib/api/api';
 
 const vendorPages = [
   { label: 'Products', href: '/products', icon: <LocalMall fontSize="small" /> },
@@ -55,7 +56,7 @@ export default function NavigationMenu() {
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await fetch('/api/logout', { method: 'POST' });
+      await api.post('/auth/logout');
       dispatch(clearUserData());
       window.location.reload();
     } finally {

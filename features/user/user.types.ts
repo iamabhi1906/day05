@@ -4,10 +4,9 @@ export const UserSchema = z.object({
   id: z.string(),
   email: z.string(),
   role: z.string(),
-  uid: z.string(),
   name: z.string(),
-  avatar: z.string().nullable(),
-  phone: z.string().nullable(),
+  avatar: z.string().optional(),
+  phone: z.string().optional(),
   createdAt: z.preprocess((value) => (value instanceof Date ? value.toISOString() : value), z.string().nullable().optional()),
   isBlocked: z.boolean(),
 });

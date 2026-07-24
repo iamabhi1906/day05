@@ -10,18 +10,15 @@ import {
   orderBy,
   query,
   QueryDocumentSnapshot,
-  serverTimestamp,
-  updateDoc,
   where,
   startAfter,
   limit,
   QueryConstraint,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { GetPublishedProductsParams, ProductData, ProductEdit, ProductInput } from '@/features/product/product.types';
+import { GetPublishedProductsParams, ProductData, ProductEdit, ProductInput, ProductStatus } from '@/features/product/product.types';
 import { Protect } from '../auth';
-
-export type ProductStatus = 'draft' | 'published';
+import { serverApi } from '../api/server.api';
 
 const productsCollection = collection(db, 'products');
 
@@ -31,60 +28,60 @@ const toDate = (value: { toDate?: () => Date } | null | undefined) => {
 
 const productFromDoc = (snapshot: QueryDocumentSnapshot<DocumentData>): ProductData => {
   const data = snapshot.data();
-  const imageUrls = Array.isArray(data.imageUrls)
-    ? data.imageUrls.filter((value) => typeof value === 'string' && value.length > 0)
+  const productImages = Array.isArray(data.productImages)
+    ? data.productImages.filter((value) => typeof value === 'string' && value.length > 0)
     : data.imageUrl
       ? [data.imageUrl]
       : [];
 
   return {
     id: snapshot.id,
-    name: data.name,
+    title: data.name,
     description: data.description,
     price: Number(data.price || 0),
     stock: Number(data.stock || 0),
     category: data.category,
-    imageUrls,
+    productImages: productImages,
     status: data.status,
-    vendorEmail: data.vendorEmail,
-    vendorName: data.vendorName,
+    userId: data.userId,
     createdAt: toDate(data.createdAt),
     updatedAt: toDate(data.updatedAt),
   };
 };
 
-export const createProduct = async (product: ProductInput) => {
-  await Protect();
-  const docRef = await addDoc(productsCollection, {
-    ...product,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-  return docRef.id;
+export const createProduct = async (product: ProductInput): Promise<ProductData> => {
+  const api = await serverApi();
+  const { data } = await api.post('/products', product);
+  return data as ProductData;
 };
 
 export const updateProduct = async (productId: string, product: ProductEdit) => {
-  await Protect();
-  await updateDoc(doc(db, 'products', productId), {
-    ...product,
-    updatedAt: serverTimestamp(),
-  });
+  const api = await serverApi();
+  const { data } = await api.put(`/products/${productId}`, product);
+  return data as ProductData;
 };
 
 export const deleteProduct = async (productId: string) => {
-  await Protect();
-  await deleteDoc(doc(db, 'products', productId));
+  const api = await serverApi();
+  await api.delete(`/products/${productId}`);
 };
 
-export const getVendorProducts = async (vendorEmail: string): Promise<ProductData[]> => {
-  const q = query(productsCollection, where('vendorEmail', '==', vendorEmail), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(productFromDoc);
+export const getVendorProducts = async (): Promise<ProductData[]> => {
+  const api = await serverApi();
+  const { data } = await api.get('/products/me');
+  return data as ProductData[];
+};
+
+export const changeProductStatus = async (productId: string, newStatus: ProductStatus): Promise<ProductData> => {
+  const api = await serverApi();
+  const { data } = await api.patch(`/products/${productId}/status`, { status: newStatus });
+  return data as ProductData;
 };
 
 export const getAllProducts = async (): Promise<ProductData[]> => {
-  const snapshot = await getDocs(query(productsCollection, orderBy('createdAt', 'desc')));
-  return snapshot.docs.map(productFromDoc);
+  const api = await serverApi();
+  const { data } = await api.get('/admin/products');
+  return data as ProductData[];
 };
 
 export const getPublishedProducts = async ({
@@ -94,44 +91,12 @@ export const getPublishedProducts = async ({
   category,
   sortBy,
 }: GetPublishedProductsParams): Promise<{ data: ProductData[]; lastDocId: string | null }> => {
-  const constraints: QueryConstraint[] = [where('status', '==', 'published')];
-
-  if (category) {
-    constraints.push(where('category', '==', category));
-  }
-
-  if (search) {
-    const searchLower = search.toLowerCase();
-    constraints.push(where('name_lowercase', '>=', searchLower));
-    constraints.push(where('name_lowercase', '<=', searchLower + '\uf8ff'));
-    constraints.push(orderBy('name_lowercase', 'asc'));
-    console.log(constraints);
-  }
-
-  if (!search && sortBy && sortBy.field) {
-    constraints.push(orderBy(sortBy.field, sortBy.order));
-  } else if (!search) {
-    constraints.push(orderBy('createdAt', 'desc'));
-  }
-
-  if (lastDocId) {
-    const docRef = doc(productsCollection, lastDocId);
-    const docSnapshot = await getDoc(docRef);
-    if (docSnapshot.exists()) {
-      constraints.push(startAfter(docSnapshot));
-    }
-  }
-  constraints.push(limit(pageSize));
-
-  const q = query(productsCollection, ...constraints);
-  const snapshot = await getDocs(q);
-
-  const data = snapshot.docs.map(productFromDoc);
-  const lastVisibleDoc = snapshot.docs[snapshot.docs.length - 1];
+  const api = await serverApi();
+  const { data } = await api.get('/products');
 
   return {
     data,
-    lastDocId: lastVisibleDoc ? lastVisibleDoc.id : null,
+    lastDocId: null,
   };
 };
 

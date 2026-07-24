@@ -1,13 +1,13 @@
 'use client';
-import { updateUserByEmail, UserData } from '@/lib/crud/user';
+import { updateUserByEmail } from '@/lib/crud/user';
 import { Avatar, Box, Typography, Button, Divider, Stack, Container } from '@mui/material';
 import styles from './profile-info.module.css';
 import Image from 'next/image';
 import { useState } from 'react';
-import { OrderData } from '@/lib/crud/order';
 import { CldUploadWidget, CloudinaryUploadWidgetResults } from 'next-cloudinary';
-import { People } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import { OrderData } from '@/features/orders/orders.types';
+import { UserData } from '@/features/user/user.types';
 
 interface Props {
   user: UserData;

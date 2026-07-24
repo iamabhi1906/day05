@@ -146,7 +146,7 @@ export default function VendorOrderCard({ order, action }: VendorOrderCardProps)
             >
               <Box sx={{ width: { xs: '100%', md: 120 }, flexShrink: 0 }}>
                 <Image
-                  src={product.productImageUrls[0]}
+                  src={product.productproductImages[0]}
                   alt={product.productName}
                   width={120}
                   height={120}

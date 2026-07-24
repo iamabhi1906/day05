@@ -13,11 +13,11 @@ import { useRef } from 'react';
 
 type ProductCardImageProps = {
   productId: string;
-  imageUrls: string[];
+  productImages: string[];
   productName: string;
 };
 
-export default function ProductCardCarousel({ productId, imageUrls, productName }: ProductCardImageProps) {
+export default function ProductCardCarousel({ productId, productImages, productName }: ProductCardImageProps) {
   const router = useRouter();
   const swiperRef = useRef<SwiperType | null>(null);
 
@@ -41,7 +41,7 @@ export default function ProductCardCarousel({ productId, imageUrls, productName 
       }}
       className={styles.swiperWrapper}
     >
-      {imageUrls.map((image, index) => (
+      {productImages.map((image, index) => (
         <SwiperSlide key={`${productId}-${index}`}>
           <Box sx={{ cursor: 'pointer' }} onClick={() => router.push(`/products/${productId}`)}>
             <Image src={image} alt={productName} width={500} height={500} className={styles.mainMedia} priority />

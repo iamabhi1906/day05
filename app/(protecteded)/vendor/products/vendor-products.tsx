@@ -1,16 +1,15 @@
 'use client';
 import { useState } from 'react';
 import { Box } from '@mui/material';
-import { UserData } from '@/lib/crud/user';
 import { ProductTable } from './components/product-table';
 import { VendorProductsHeader } from './components/vendor-products-header';
 import AddProductDialogBox from './components/add-product-dialog-box';
 import EditProductDialogBox from './components/edit-product-dialog-box';
-import { ProductData } from '@/features/product/product.types';
-import { deleteProduct, getVendorProducts } from '@/lib/crud/product';
+import { ProductData, ProductStatus } from '@/features/product/product.types';
+import { changeProductStatus, deleteProduct, getVendorProducts } from '@/lib/crud/product';
 import { enqueueSnackbar } from 'notistack';
 
-export default function VendorProducts({ initialProducts, user }: { initialProducts: ProductData[]; user: UserData }) {
+export default function VendorProducts({ initialProducts }: { initialProducts: ProductData[]}) {
   const [products, setProducts] = useState<ProductData[]>(initialProducts);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
   const [editingProduct, setEditingProduct] = useState<ProductData | null>(null);
@@ -23,10 +22,10 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
     try {
       setIsAddDialogOpen(false);
       setEditingProduct(null);
-      const refreshProduct = await getVendorProducts(user.email);
+      const refreshProduct = await getVendorProducts();
       setProducts(refreshProduct);
     } catch (error) {
-      console.log('Error refreshing the products..!!');
+      console.log('Error refreshing the products..!!', error);
     }
   };
 
@@ -40,14 +39,24 @@ export default function VendorProducts({ initialProducts, user }: { initialProdu
       enqueueSnackbar('Failed to delete product.', { variant: 'error' });
     }
   };
+  const onStatusChange = async (product: ProductData, newStatus: ProductStatus) => {
+    try {
+      const updatedProducts = await changeProductStatus(product.id, newStatus);
+      setProducts((currentProducts) => currentProducts.map((p) => (p.id === updatedProducts.id ? updatedProducts : p)));
+      enqueueSnackbar('Product status updated successfully.', { variant: 'success' });
+    } catch (error) {
+      console.error('Failed to update product status:', error);
+      enqueueSnackbar('Failed to update product status.', { variant: 'error' });
+    }
+  };
 
   return (
     <Box sx={{ p: 3 }}>
       <VendorProductsHeader onAddProduct={() => setIsAddDialogOpen(true)} />
-      <AddProductDialogBox open={isAddDialogOpen} userData={user} onClose={handleClose} />
+      <AddProductDialogBox open={isAddDialogOpen} onClose={handleClose} />
       {editingProduct ? <EditProductDialogBox open={Boolean(editingProduct)} productData={editingProduct} onClose={handleClose} /> : null}
       <Box>
-        <ProductTable products={products} onEdit={handleEdit} onDelete={handleDelete} />
+        <ProductTable products={products} onEdit={handleEdit} onDelete={handleDelete} onStatusChange={onStatusChange} />
       </Box>
     </Box>
   );

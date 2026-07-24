@@ -4,6 +4,7 @@ import { getUserByEmail } from '@/lib/crud/user';
 import { Card, Container, Stack, Typography } from '@mui/material';
 import { getBuyerOrders } from '@/services/orders/get-buyer-orders';
 import OrderProductCard from './components/order-card';
+import { serverApi } from '@/lib/api/server.api';
 
 export function groupOrdersById<T extends { orderId: string | number }>(orders: T[]) {
   return Object.values(
@@ -25,14 +26,11 @@ export function groupOrdersById<T extends { orderId: string | number }>(orders: 
 }
 
 export default async function Page() {
-  const session = await getSession();
-  const email = session?.email;
-  if (!email) redirect('/login');
-
-  const user = await getUserByEmail(email);
+  const api = await serverApi();
+  const { data: user } = await api.get('/auth/me');
   if (!user) redirect('/login');
 
-  const orders = await getBuyerOrders();
+  const orders = await getBuyerOrders(user);
   const groupedOrders = groupOrdersById(orders);
 
   return (

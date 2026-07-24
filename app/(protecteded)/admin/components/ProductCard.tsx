@@ -1,28 +1,21 @@
 import { Card, CardActions, CardContent, Divider, Button, Stack, Typography } from '@mui/material';
 import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined';
 import styles from '../admin.module.css';
+import { ProductData } from '@/features/product/product.types';
 
-type Product = {
-  id: string;
-  name: string;
-  vendorName?: string;
-  category?: string;
-  price?: number;
-  stock?: number;
-};
-
-export default function ProductCard({ product, action }: { product: Product; action: any }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default function ProductCard({ product, action }: { product: ProductData; action: any }) {
   return (
     <Card className={styles.cardRoot} variant="outlined">
       <CardContent>
         <Stack spacing={1}>
           <Stack sx={{ flexDirection: 'row', alignItems: 'center' }} spacing={1}>
             <Typography variant="subtitle1" component="h2">
-              {product.name}
+              {product.title}
             </Typography>
           </Stack>
           <Typography variant="body2" color="text.secondary">
-            Vendor: {product.vendorName}
+            Vendor: {product.userId}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Category: {product.category}

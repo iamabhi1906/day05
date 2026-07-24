@@ -75,7 +75,7 @@ export default function ProductCardActions({ product }: ProductCardActionsProps)
     <Box className={styles.cardActions}>
       <Stack spacing={2}>
         <Stack direction={'row'} sx={{ justifyContent: 'space-between' }}>
-          <Typography noWrap>{product.name}</Typography>
+          <Typography noWrap>{product.title}</Typography>
           <FavoriteBorder />
         </Stack>
         <Stack direction={'row'} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>

@@ -31,7 +31,7 @@ export async function PlaceAnOrder(cartItems: CartData[], promoCode: string | nu
       paymentStatus: OrderPaymentStatus.PAID,
       productId: cartItem.productId,
       productName: cartItem.productName,
-      productImageUrls: cartItem.productImageUrls,
+      productproductImages: cartItem.productproductImages,
       productPrice: cartItem.price,
       vendorEmail: cartItem.vendorEmail,
       quantity: cartItem.quantity,

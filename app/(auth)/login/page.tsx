@@ -108,9 +108,9 @@ export default function LoginPage() {
             </Typography>
           </Box>
 
-          <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth onClick={handleGoogleLogin} disabled={loading}>
+          {/* <Button variant="outlined" startIcon={<GoogleIcon />} fullWidth onClick={handleGoogleLogin} disabled={loading}>
             {loading ? 'Processing...' : 'Continue with Google'}
-          </Button>
+          </Button> */}
 
           <Box className={styles.dividerWrapper}>
             <Divider className={styles.divider} />

@@ -9,7 +9,7 @@ export type ProductFormState = {
   stock: string;
   category: string;
   imageUrl: string;
-  imageUrls: string[];
+  productImages: string[];
   imagePublicId: string;
   imagePublicIds: string[];
   status: ProductStatus;
@@ -36,7 +36,7 @@ export const emptyForm: ProductFormState = {
   stock: '',
   category: '',
   imageUrl: '',
-  imageUrls: [],
+  productImages: [],
   imagePublicId: '',
   imagePublicIds: [],
   status: 'draft',

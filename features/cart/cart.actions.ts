@@ -46,7 +46,7 @@ export const getUserCartItemsAsync = createAsyncThunk<CartData[], CartUser, { re
             id: unProcessedCartProduct.productId,
             name: unProcessedCartProduct.productName,
             price: unProcessedCartProduct.price,
-            imageUrls: unProcessedCartProduct.productImageUrls,
+            productImages: unProcessedCartProduct.productproductImages,
             vendorEmail: unProcessedCartProduct.vendorEmail,
           } as ProductData);
         }
@@ -103,7 +103,7 @@ export const addUserCartItemAsync = createAsyncThunk<CartData[], AddCartPayload,
             buyerEmail: null,
             productId: product.id,
             productName: product.name,
-            productImageUrls: product.imageUrls,
+            productproductImages: product.productImages,
             vendorEmail: product.vendorEmail,
             price: product.price,
             quantity: 1,

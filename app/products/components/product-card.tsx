@@ -10,7 +10,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Card>
-      <ProductCardCarousel productId={product.id} imageUrls={product.imageUrls} productName={product.name} />
+      <ProductCardCarousel productId={product.id} productImages={product.productImages} productName={product.title} />
       <ProductCardActions product={product} />
     </Card>
   );

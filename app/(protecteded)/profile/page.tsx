@@ -7,17 +7,15 @@ import ProfileInfo from './components/profile-Info';
 import ProfileTabs from './components/profile-tabs';
 import styles from './profile.module.css';
 import { getBuyerOrders } from '@/services/orders/get-buyer-orders';
+import { serverApi } from '@/lib/api/server.api';
+import { UserData } from '@/features/user/user.types';
 
 export default async function Page() {
-  const session = await getSession();
-  const email = session?.email;
-
-  if (!email) redirect('/login');
-
-  const user = await getUserByEmail(email);
+  const api = await serverApi();
+  const user: UserData = await api.get('/auth/me');
   if (!user) redirect('/login');
-  const addresses = await getUserAddresses(email);
-  const orders = await getBuyerOrders();
+  const addresses = await getUserAddresses(user.email);
+  const orders = await getBuyerOrders(user);
 
   return (
     <Container className={styles.page}>

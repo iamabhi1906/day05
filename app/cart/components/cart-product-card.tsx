@@ -62,7 +62,7 @@ export default function CartProductCard({ cartItem }: CartProductCardProps) {
 
   return (
     <Box className={styles.cartProductCard}>
-      <Image src={cartItem.productImageUrls[0]} width={100} height={100} alt={cartItem.productName} className={styles.productImage} />
+      <Image src={cartItem.productproductImages[0]} width={100} height={100} alt={cartItem.productName} className={styles.productImage} />
       <Stack direction={'row'} sx={{ justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
         <Stack>
           <Typography sx={{ fontWeight: 600, fontSize: 22 }}>{cartItem.productName}</Typography>

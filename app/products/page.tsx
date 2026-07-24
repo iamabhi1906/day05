@@ -6,6 +6,7 @@ import styles from './page.module.css';
 
 export default async function Page() {
   const { data, lastDocId } = await getPublishedProducts({});
+  console.log(data);
   return (
     <Box className={styles.page}>
       <Stack direction="row" spacing={1.5} className={styles.header}>
