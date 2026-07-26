@@ -44,10 +44,14 @@ export const getUserCartItemsAsync = createAsyncThunk<CartData[], CartUser, { re
         for (const unProcessedCartProduct of unProcessedCartProducts) {
           await addProductToCart(buyerEmail, {
             id: unProcessedCartProduct.productId,
-            name: unProcessedCartProduct.productName,
+            title: unProcessedCartProduct.productName,
             price: unProcessedCartProduct.price,
             productImages: unProcessedCartProduct.productproductImages,
-            vendorEmail: unProcessedCartProduct.vendorEmail,
+            userId: '',
+            description: '',
+            stock: 0,
+            category: 'groceries',
+            status: 'PUBLISHED',
           } as ProductData);
         }
         localStorage.removeItem('cart');
@@ -102,9 +106,9 @@ export const addUserCartItemAsync = createAsyncThunk<CartData[], AddCartPayload,
             id: product.id,
             buyerEmail: null,
             productId: product.id,
-            productName: product.name,
+            productName: product.title,
             productproductImages: product.productImages,
-            vendorEmail: product.vendorEmail,
+            vendorEmail: '',
             price: product.price,
             quantity: 1,
             addedAt: new Date().toISOString(),

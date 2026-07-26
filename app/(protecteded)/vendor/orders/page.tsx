@@ -1,11 +1,10 @@
 import { redirect } from 'next/navigation';
 import { Container, Stack, Typography, Alert } from '@mui/material';
-import { getSession } from '@/lib/auth';
-import { getUserByEmail } from '@/lib/crud/user';
 import { getVendorOrders } from '@/services/orders/vendor-orders';
 import VendorOrderCard from './components/vendor-order-card';
 import { updateVendorOrderStatus } from './actions';
 import { OrderData } from '@/features/orders/orders.types';
+import { serverApi } from '@/lib/api/server.api';
 
 function groupOrdersById<T extends { orderId: string | number }>(orders: T[]) {
   return Object.values(
@@ -27,11 +26,8 @@ function groupOrdersById<T extends { orderId: string | number }>(orders: T[]) {
 }
 
 export default async function Page() {
-  const session = await getSession();
-  const email = session?.email;
-  if (!email) redirect('/login');
-
-  const user = await getUserByEmail(email);
+  const api = await serverApi();
+  const { data: user } = await api.get('/auth/me');
   if (!user) redirect('/login');
   if (user.role !== 'vendor') redirect('/products');
 

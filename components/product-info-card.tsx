@@ -15,14 +15,14 @@ export default async function ProductInfoCard({ productId }: { productId: string
       <Card elevation={0}>
         <Box className={styles.wrapper}>
           <Box className={styles.imageSection}>
-            <Image src={product.productImages?.[0]} alt={product.name} className={styles.image} width={200} height={200} />
+            <Image src={product.productImages?.[0]} alt={product.title} className={styles.image} width={200} height={200} />
             <Box>
               <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                  {product.name}
+                  {product.title}
                 </Typography>
 
-                <Chip label={product.status} color={product.status === 'published' ? 'success' : 'default'} size="small" />
+                <Chip label={product.status} color={product.status === 'PUBLISHED' ? 'success' : 'default'} size="small" />
               </Stack>
 
               <Typography variant="body1" color="text.secondary">
@@ -74,10 +74,10 @@ export default async function ProductInfoCard({ productId }: { productId: string
                 Vendor
               </Typography>
 
-              <Typography sx={{ fontWeight: 600 }}>{product.vendorName}</Typography>
+              <Typography sx={{ fontWeight: 600 }}>Vendor</Typography>
 
               <Typography variant="body2" color="text.secondary">
-                {product.vendorEmail}
+                Product ID: {product.userId}
               </Typography>
             </Box>
           </Stack>

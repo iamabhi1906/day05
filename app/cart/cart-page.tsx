@@ -22,16 +22,12 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { placeOrder } from '@/lib/crud/order';
 import styles from './cart-page.module.css';
 import Image from 'next/image';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '../store';
 import { CartData } from '@/features/cart/cart.types';
-import { removeUserCartItem } from '@/services/cart/remove.cart';
 import { useRouter } from 'next/navigation';
-import { getSession } from '@/lib/auth';
-import { getUserByEmail } from '@/lib/crud/user';
 import { updateUserCartItemQuantityAsync, removeUserCartItemAsync, getUserCartItemsAsync } from '@/features/cart/cart.actions';
 
 const currency = new Intl.NumberFormat('en-US', {

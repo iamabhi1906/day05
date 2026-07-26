@@ -1,12 +1,5 @@
-import { db } from '@/lib/firebase';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { getCartItems } from './get.cart';
+import api from '@/lib/api/api';
 
-export const removeUserCartItem = async (cartItemId: string) => {
-  await deleteDoc(doc(db, 'cartItems', cartItemId));
-};
+export const removeUserCartItem = async (cartItemId: string) => { await api.delete(`/cart/${cartItemId}`); };
 
-export const clearUserCartItems = async (buyerEmail: string) => {
-  const items = await getCartItems(buyerEmail);
-  await Promise.all(items.map((item) => deleteDoc(doc(db, 'cartItems', item.id))));
-};
+export const clearUserCartItems = async (_buyerEmail?: string) => { await api.delete('/cart'); };

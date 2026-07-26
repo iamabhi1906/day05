@@ -19,7 +19,7 @@ export default function ProductImageGallery({ product }: ProductImageGalleryProp
       <CardMedia
         component="img"
         image={productImages[currentIndex]}
-        alt={product.name}
+        alt={product.title}
         sx={{
           width: '100%',
           height: 400,
@@ -32,10 +32,10 @@ export default function ProductImageGallery({ product }: ProductImageGalleryProp
         <Stack direction="row" spacing={1} sx={{ overflowX: 'auto', pb: 1 }}>
           {productImages.map((image, index) => (
             <CardMedia
-              key={`${product.name}-${index}`}
+              key={`${product.title}-${index}`}
               component="img"
               image={image}
-              alt={`${product.name} ${index + 1}`}
+              alt={`${product.title} ${index + 1}`}
               onClick={() => onSelectImage(index)}
               sx={{
                 width: 80,

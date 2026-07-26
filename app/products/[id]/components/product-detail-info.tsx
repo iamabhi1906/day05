@@ -20,7 +20,7 @@ export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
       <Stack spacing={1}>
         <Stack direction="row" spacing={2}>
           <Typography variant="h4" sx={{ fontWeight: 700, flex: 1 }}>
-            {product.name}
+            {product.title}
           </Typography>
           <Chip label={product.category} color="primary" />
         </Stack>
@@ -53,9 +53,9 @@ export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
             Sold by
           </Typography>
         </Stack>
-        <Typography variant="body2">{product.vendorName}</Typography>
+        <Typography variant="body2">Vendor</Typography>
         <Typography variant="caption" color="text.secondary">
-          {product.vendorEmail}
+          Product ID: {product.userId}
         </Typography>
       </Box>
 

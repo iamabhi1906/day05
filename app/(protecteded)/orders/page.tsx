@@ -1,6 +1,4 @@
 import { redirect } from 'next/navigation';
-import { getSession } from '@/lib/auth';
-import { getUserByEmail } from '@/lib/crud/user';
 import { Card, Container, Stack, Typography } from '@mui/material';
 import { getBuyerOrders } from '@/services/orders/get-buyer-orders';
 import OrderProductCard from './components/order-card';
@@ -30,7 +28,7 @@ export default async function Page() {
   const { data: user } = await api.get('/auth/me');
   if (!user) redirect('/login');
 
-  const orders = await getBuyerOrders(user);
+  const orders = await getBuyerOrders();
   const groupedOrders = groupOrdersById(orders);
 
   return (

@@ -1,21 +1,13 @@
+import api from '@/lib/api/api';
+import { cartFromApi } from '@/lib/api/commerce';
 import { CartData } from '@/features/cart/cart.types';
-import { db } from '@/lib/firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { cartItemFromDoc } from './cart';
 
-const cartCollection = collection(db, 'cartItems');
-
-export const getCartItems = async (buyerEmail: string): Promise<CartData[]> => {
-  const q = query(cartCollection, where('buyerEmail', '==', buyerEmail));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(cartItemFromDoc);
+export const getCartItems = async (_buyerEmail?: string): Promise<CartData[]> => {
+  const { data } = await api.get('/cart');
+  return (data as Record<string, unknown>[]).map(cartFromApi);
 };
 
-export const getProductCartItem = async (buyerEmail: string, productId: string): Promise<CartData | null> => {
-  const q = query(cartCollection, where('buyerEmail', '==', buyerEmail), where('productId', '==', productId));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) {
-    return null;
-  }
-  return cartItemFromDoc(snapshot.docs[0]);
+export const getProductCartItem = async (_buyerEmail: string, productId: string): Promise<CartData | null> => {
+  const items = await getCartItems();
+  return items.find((item) => item.productId === productId) ?? null;
 };

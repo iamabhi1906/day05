@@ -1,17 +1,17 @@
 'use server';
-import { Review, ReviewForm, ReviewFormOutput, reviewSchema } from '@/features/review/review.types';
-import { addDoc } from 'firebase/firestore';
-import { reviewCollection } from './collection';
-import { Protect } from '@/lib/auth';
+
+import { ReviewFormOutput } from '@/features/review/review.types';
+import { serverApi } from '@/lib/api/server.api';
 import { revalidatePath } from 'next/cache';
 
 export async function addReview(review: ReviewFormOutput) {
-  try {
-    await Protect();
-    const payload: Review = reviewSchema.parse({ ...review, createdAt: new Date(), helpfulCount: 0 });
-    await addDoc(reviewCollection, payload);
-    revalidatePath('/orders');
-  } catch {
-    throw new Error('Error adding review');
-  }
+  const api = await serverApi();
+  await api.post('/reviews', {
+    orderId: Number(review.orderId),
+    productId: Number(review.productId),
+    rating: review.rating,
+    comment: review.comment,
+    media: review.media ?? [],
+  });
+  revalidatePath('/orders');
 }

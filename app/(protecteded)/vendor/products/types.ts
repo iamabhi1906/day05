@@ -39,7 +39,7 @@ export const emptyForm: ProductFormState = {
   productImages: [],
   imagePublicId: '',
   imagePublicIds: [],
-  status: 'draft',
+  status: 'DRAFT',
 };
 
 export type ProductTableRowProps = {
