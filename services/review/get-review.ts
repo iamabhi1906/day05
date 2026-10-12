@@ -16,12 +16,12 @@ const reviewFromApi = (item: Record<string, unknown>): Review => ({
   createdAt: String(item.createdAt),
 });
 
-export async function getProductReview(productId: string, orderId: string): Promise<Review | null> {
+export async function getProductReview(productId: number, orderId: string): Promise<Review | null> {
   const reviews = await getAllProductReviews(productId);
   return reviews.find((review) => review.orderId === orderId) ?? null;
 }
 
-export async function getAllProductReviews(productId: string): Promise<Review[]> {
+export async function getAllProductReviews(productId: number): Promise<Review[]> {
   const api = await serverApi();
   const { data } = await api.get(`/reviews/product/${productId}`);
   return (data as Record<string, unknown>[]).map(reviewFromApi);

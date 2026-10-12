@@ -1,7 +1,8 @@
 import api from '@/lib/api/api';
 import { ProductData } from '@/features/product/product.types';
+import { ApiProduct } from '@/lib/crud/product';
 
-export const addProductToCart = async (_buyerEmail: string, product: ProductData) => {
+export const addProductToCart = async (_buyerEmail: string, product: ApiProduct) => {
   await api.post('/cart', { productId: Number(product.id), quantity: 1 });
 };
 

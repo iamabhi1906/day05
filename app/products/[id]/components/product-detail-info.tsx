@@ -2,7 +2,7 @@
 
 import { Box, Chip, Grid, Stack, Typography } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import { ProductData } from '@/features/product/product.types';
+import { ApiProduct } from '@/lib/crud/product';
 
 const currency = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -10,7 +10,7 @@ const currency = new Intl.NumberFormat('en-US', {
 });
 
 type ProductDetailInfoProps = {
-  product: ProductData;
+  product: ApiProduct;
 };
 
 export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
@@ -55,7 +55,7 @@ export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
         </Stack>
         <Typography variant="body2">Vendor</Typography>
         <Typography variant="caption" color="text.secondary">
-          Product ID: {product.userId}
+          Product ID: {product.id}
         </Typography>
       </Box>
 
@@ -65,10 +65,10 @@ export default function ProductDetailInfo({ product }: ProductDetailInfoProps) {
         </Typography>
         <Grid container spacing={2}>
           <Grid container>
-            <Typography variant="caption" color="text.secondary">
+            {/* <Typography variant="caption" color="text.secondary">
               Status
             </Typography>
-            <Typography variant="body2">{product.status}</Typography>
+            <Typography variant="body2">{product.status}</Typography> */}
           </Grid>
           <Grid container>
             <Typography variant="caption" color="text.secondary">

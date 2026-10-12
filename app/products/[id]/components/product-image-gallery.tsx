@@ -1,14 +1,15 @@
 'use client';
 
-import { ProductData } from '@/features/product/product.types';
+import { ApiProduct } from '@/lib/crud/product';
 import { CardMedia, Stack } from '@mui/material';
 import { useState } from 'react';
 
 type ProductImageGalleryProps = {
-  product: ProductData;
+  product: ApiProduct;
 };
 
 export default function ProductImageGallery({ product }: ProductImageGalleryProps) {
+  console.log(product);
   const productImages = product.productImages;
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   function onSelectImage(index: number) {

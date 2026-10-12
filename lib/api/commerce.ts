@@ -29,9 +29,9 @@ export const productFromApi = (product: ApiProduct): ProductData => ({
 export const cartFromApi = (item: ApiCartItem): CartData => {
   const product = item.product as ApiProduct;
   return {
-    id: stringValue(item.id),
+    id: Number(item.id),
     buyerEmail: null,
-    productId: stringValue(item.productId),
+    productId: Number(item.productId),
     productName: stringValue(product?.title),
     productproductImages: strings(product?.productImages),
     vendorEmail: stringValue((product?.user as ApiProduct | undefined)?.email),

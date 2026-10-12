@@ -5,6 +5,7 @@ import { ProductData } from '../product/product.types';
 import { addProductToCart } from '@/services/cart/add.cart';
 import { removeCartItem, updateCartItemQuantity } from '@/lib/crud/cart';
 import { clearUserCartItems } from '@/services/cart/remove.cart';
+import { ApiProduct } from '@/lib/crud/product';
 
 interface CartUser {
   buyerEmail: string | null;
@@ -15,7 +16,7 @@ interface GetProductCartItem extends CartUser {
 }
 
 interface AddCartPayload extends CartUser {
-  product: ProductData;
+  product: ApiProduct;
 }
 
 interface RemoveCartPayload extends CartUser {
@@ -42,17 +43,7 @@ export const getUserCartItemsAsync = createAsyncThunk<CartData[], CartUser, { re
       if (rawData) {
         const unProcessedCartProducts = JSON.parse(rawData) as CartData[];
         for (const unProcessedCartProduct of unProcessedCartProducts) {
-          await addProductToCart(buyerEmail, {
-            id: unProcessedCartProduct.productId,
-            title: unProcessedCartProduct.productName,
-            price: unProcessedCartProduct.price,
-            productImages: unProcessedCartProduct.productproductImages,
-            userId: '',
-            description: '',
-            stock: 0,
-            category: 'groceries',
-            status: 'PUBLISHED',
-          } as ProductData);
+          await addProductToCart(buyerEmail, unProcessedCartProduct);
         }
         localStorage.removeItem('cart');
       }

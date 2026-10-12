@@ -5,7 +5,7 @@ import ProductDisplay from './components/product-display';
 import styles from './page.module.css';
 
 export default async function Page() {
-  const { data, lastDocId } = await getPublishedProducts({});
+  const { data, lastDocId } = await getPublishedProducts();
   console.log(data);
   return (
     <Box className={styles.page}>

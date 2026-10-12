@@ -1,23 +1,33 @@
 'use server';
-
-import { productFromApi } from '@/lib/api/commerce';
 import { serverApi } from '@/lib/api/server.api';
-import { GetPublishedProductsParams, ProductData, ProductEdit, ProductInput, ProductStatus } from '@/features/product/product.types';
+import { ProductEdit, ProductInput, ProductStatus } from '@/features/product/product.types';
 
 export type { ProductStatus } from '@/features/product/product.types';
 
-type ApiProduct = Record<string, unknown>;
-
-export const createProduct = async (product: ProductInput): Promise<ProductData> => {
-  const api = await serverApi();
-  const { data } = await api.post('/products', product);
-  return productFromApi(data as ApiProduct);
+export type ApiProduct = {
+  id: number;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  productImages: string[];
+  user: {
+    name: string;
+    email: string;
+  };
 };
 
-export const updateProduct = async (productId: string, product: ProductEdit): Promise<ProductData> => {
+export const createProduct = async (product: ProductInput): Promise<ApiProduct> => {
+  const api = await serverApi();
+  const { data } = await api.post('/products', product);
+  return data as ApiProduct;
+};
+
+export const updateProduct = async (productId: string, product: ProductEdit): Promise<ApiProduct> => {
   const api = await serverApi();
   const { data } = await api.put(`/products/${productId}`, product);
-  return productFromApi(data as ApiProduct);
+  return data as ApiProduct;
 };
 
 export const deleteProduct = async (productId: string) => {
@@ -25,32 +35,32 @@ export const deleteProduct = async (productId: string) => {
   await api.delete(`/products/${productId}`);
 };
 
-export const getVendorProducts = async (): Promise<ProductData[]> => {
+export const getVendorProducts = async (): Promise<ApiProduct[]> => {
   const api = await serverApi();
   const { data } = await api.get('/products/me');
-  return (data as ApiProduct[]).map(productFromApi);
+  return data as ApiProduct[];
 };
 
-export const changeProductStatus = async (productId: string, status: ProductStatus): Promise<ProductData> => {
+export const changeProductStatus = async (productId: string, status: ProductStatus): Promise<ApiProduct> => {
   const api = await serverApi();
   const { data } = await api.patch(`/products/${productId}/status`, { status });
-  return productFromApi(data as ApiProduct);
+  return data as ApiProduct;
 };
 
-export const getAllProducts = async (): Promise<ProductData[]> => {
+export const getAllProducts = async (): Promise<ApiProduct[]> => {
   const api = await serverApi();
   const { data } = await api.get('/admin/products');
-  return (data as ApiProduct[]).map(productFromApi);
+  return data as ApiProduct[];
 };
 
-export const getPublishedProducts = async (_params: GetPublishedProductsParams) => {
+export const getPublishedProducts = async () => {
   const api = await serverApi();
   const { data } = await api.get('/products');
-  return { data: (data as ApiProduct[]).map(productFromApi), lastDocId: null };
+  return { data: data as ApiProduct[], lastDocId: null };
 };
 
-export const getProduct = async (productId: string): Promise<ProductData | null> => {
+export const getProduct = async (productId: string): Promise<ApiProduct | null> => {
   const api = await serverApi();
   const { data, status } = await api.get(`/products/${productId}`);
-  return status === 200 && data ? productFromApi(data as ApiProduct) : null;
+  return status === 200 && data ? (data as ApiProduct) : null;
 };

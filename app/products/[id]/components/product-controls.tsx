@@ -4,7 +4,6 @@ import { Button, IconButton, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { ProductData } from '@/features/product/product.types';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '@/app/store';
 import { CartData } from '@/features/cart/cart.types';
@@ -14,9 +13,10 @@ import { enqueueSnackbar } from 'notistack';
 import NumberSpinner from '@/components/number-spinner';
 import { ShoppingBag } from '@mui/icons-material';
 import Link from 'next/link';
+import { ApiProduct } from '@/lib/crud/product';
 
 type ProductControlsProps = {
-  product: ProductData;
+  product: ApiProduct;
 };
 
 export default function ProductControls({ product }: ProductControlsProps) {
@@ -36,7 +36,7 @@ export default function ProductControls({ product }: ProductControlsProps) {
       setLoading(true);
       await dispatch(addUserCartItemAsync({ buyerEmail: userData?.email ?? null, product }));
       enqueueSnackbar('Product Add to cart', { variant: 'success' });
-    } catch (error) {
+    } catch {
       enqueueSnackbar('Error Add Product to cart', { variant: 'error' });
     } finally {
       setLoading(false);

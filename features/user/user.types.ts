@@ -1,12 +1,12 @@
 import z from 'zod';
 
 export const UserSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   email: z.string(),
   role: z.string(),
   name: z.string(),
-  avatar: z.string().optional(),
-  phone: z.string().optional(),
+  avatar: z.string().optional().nullable(),
+  phone: z.string().optional().nullable(),
   createdAt: z.preprocess((value) => (value instanceof Date ? value.toISOString() : value), z.string().nullable().optional()),
   isBlocked: z.boolean(),
 });

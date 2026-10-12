@@ -1,9 +1,9 @@
 import z from 'zod';
 
 export const CartSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   buyerEmail: z.email().nullable(),
-  productId: z.string(),
+  productId: z.number(),
   productName: z.string(),
   productproductImages: z.array(z.string()),
   vendorEmail: z.string(),
